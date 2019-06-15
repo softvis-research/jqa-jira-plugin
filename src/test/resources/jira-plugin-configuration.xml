@@ -1,0 +1,12 @@
+<jira-configuration>
+
+    <jira-url>https://jqassistant-plugin.atlassian.net</jira-url>
+    <credentials>
+        <user>testuser</user>
+        <password>secret</password>
+    </credentials>
+
+    <jira-project>
+        <name>Project X</name>
+    </jira-project>
+</jira-configuration>
