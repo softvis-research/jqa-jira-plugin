@@ -6,8 +6,15 @@ import com.buschmais.jqassistant.core.scanner.api.Scope;
 import com.buschmais.jqassistant.plugin.common.api.model.FileDescriptor;
 import com.buschmais.jqassistant.plugin.common.api.scanner.AbstractScannerPlugin;
 import com.buschmais.jqassistant.plugin.common.api.scanner.filesystem.FileResource;
-import lombok.extern.slf4j.Slf4j;
+import org.jdom2.JDOMException;
+import org.jqassistant.contrib.plugin.jira.cache.CacheEndpoint;
+import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraPluginConfiguration;
+import org.jqassistant.contrib.plugin.jira.jdom.XMLParser;
 import org.jqassistant.contrib.plugin.jira.model.JiraPluginConfigurationFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * The {@link JiraScannerPlugin} class is the centerpiece of the Jira plugin.
@@ -15,9 +22,10 @@ import org.jqassistant.contrib.plugin.jira.model.JiraPluginConfigurationFile;
  * It specifies which files shall be processed by the plugin (see {@link #accepts(FileResource, String, Scope)}).
  * Furthermore, it starts the scan process with its {@link #scan(FileResource, String, Scope, Scanner)} method.
  */
-@Slf4j
 @ScannerPlugin.Requires(FileDescriptor.class)
 public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraPluginConfigurationFile> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JiraScannerPlugin.class);
 
     private static final String JQASSISTANT_PLUGIN_JIRA_FILENAME = "jqassistant.plugin.jira.filename";
 
@@ -34,7 +42,7 @@ public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraP
         if (getProperties().containsKey(JQASSISTANT_PLUGIN_JIRA_FILENAME)) {
             jiraFileName = (String) getProperties().get(JQASSISTANT_PLUGIN_JIRA_FILENAME);
         }
-        log.info("Jira plugin looks for files named '{}'.", jiraFileName);
+        LOGGER.info("Jira plugin looks for files named '{}'.", jiraFileName);
     }
 
 
@@ -51,7 +59,7 @@ public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraP
         boolean accepted = path.toLowerCase().endsWith(jiraFileName);
 
         if (accepted) {
-            log.debug("Jira plugin accepted file '{}'.", path);
+            LOGGER.debug("Jira plugin accepted file '{}'.", path);
         }
         return accepted;
     }
@@ -68,18 +76,59 @@ public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraP
      * @param scanner The jQAssistant scanner which will be used to extract the main descriptor and the jQAssistant
      *                store.
      * @return The main descriptor which can specify multiple repositories.
+     * @throws IOException If the application can't open a file stream for the configuration file.
      */
     @Override
-    public JiraPluginConfigurationFile scan(FileResource item, String path, Scope scope, Scanner scanner) {
+    public JiraPluginConfigurationFile scan(FileResource item, String path, Scope scope, Scanner scanner) throws IOException {
 
-        log.debug("Jira plugin scans file '{}'.", path);
+        LOGGER.debug("Jira plugin scans file '{}'.", path);
 
-        // Create the root descriptor
+        XMLJiraPluginConfiguration xmlJiraPluginConfiguration = this.readConfigurationFile(item);
+
+        final JiraPluginConfigurationFile jiraPluginConfigurationFile = this.createRootDescriptor(scanner);
+
+        CacheEndpoint cacheEndpoint = new CacheEndpoint(getScannerContext().getStore());
+        this.buildCompleteDescriptorGraph(jiraPluginConfigurationFile, xmlJiraPluginConfiguration, cacheEndpoint);
+
+        return jiraPluginConfigurationFile;
+    }
+
+    private XMLJiraPluginConfiguration readConfigurationFile(FileResource fileResource) throws IOException {
+
+        XMLParser xmlParser = new XMLParser();
+
+        try {
+            return xmlParser.parseConfiguration(fileResource.createStream());
+        } catch (JDOMException e) {
+            LOGGER.error(fileResource.getFile().getAbsolutePath() + " could not be parsed. Error:", e);
+            return null;
+        }
+    }
+
+    private JiraPluginConfigurationFile createRootDescriptor(Scanner scanner) {
+
         FileDescriptor fileDescriptor = scanner.getContext().getCurrentDescriptor();
         return scanner
                 .getContext()
                 .getStore()
                 .addDescriptorType(fileDescriptor, JiraPluginConfigurationFile.class);
+    }
+
+    private void buildCompleteDescriptorGraph(JiraPluginConfigurationFile jiraPluginConfigurationFile,
+                                              XMLJiraPluginConfiguration xmlJiraPluginConfiguration,
+                                              CacheEndpoint cacheEndpoint) {
+
+        GraphBuilder graphBuilder = new GraphBuilder(xmlJiraPluginConfiguration, cacheEndpoint);
+
+        // Keep this outer try catch as jQAssistant won't log the errors correctly.
+        // Instead it will log:
+        // Exception in thread "main" com.buschmais.xo.api.XOException: There is no existing transaction.
+        try {
+            graphBuilder.startTraversal(jiraPluginConfigurationFile, xmlJiraPluginConfiguration);
+        } catch(Exception e) {
+            e.printStackTrace();
+            LOGGER.error(e.getMessage());
+        }
     }
 }
 

@@ -1,22 +1,46 @@
-<?org.jqassistant.contrib.plugin.githubissues.xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.jqassistant.contrib.common</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.6.0</version>
+    </parent>
 
-    <groupId>de.uni-leipzig.softvis-research</groupId>
+    <groupId>org.jqassistant.contrib.plugin</groupId>
     <artifactId>jqa-jira-plugin</artifactId>
     <version>0.1-SNAPSHOT</version>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <name>jQAssistant Jira Plugin</name>
+    <description>The jQAssistant plugin to scan and to analyze a Jira instance.</description>
+    <url>http://jqassistant.org/</url>
 
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
-    </properties>
+    <developers>
+        <developer>
+            <id>stefan-bechert</id>
+            <name>Stefan Bechert</name>
+        </developer>
+        <developer>
+            <id>richard-mueller</id>
+            <name>Richard Mueller</name>
+            <email>rmueller@wifa.uni-leipzig.de</email>
+        </developer>
+        <developer>
+            <id>dirk-mahler</id>
+            <name>Dirk Mahler</name>
+            <email>dirk.mahler@buschmais.com</email>
+        </developer>
+    </developers>
 
-    <!-- The Jira REST java client is part of the Atlassian maven repository-->
+    <licenses>
+        <license>
+            <name>GNU General Public License, v3</name>
+            <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+        </license>
+    </licenses>
+
     <repositories>
         <repository>
             <id>atlassian-public</id>
@@ -33,13 +57,100 @@
         </repository>
     </repositories>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+
+        <com.buschmais.xo.version>0.9.0</com.buschmais.xo.version>
+        <org.neo4j.version>3.3.4</org.neo4j.version>
+        <org.slf4j.version>1.7.12</org.slf4j.version>
+        <org.hamcrest.version>2.0.0.0</org.hamcrest.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.1</version>
+
+                <configuration>
+                    <artifactSet>
+                        <excludes>
+                            <exclude>com.buschmais.xo:*</exclude>
+                            <exclude>javax.xml.bind:*</exclude>
+                            <exclude>javax.ws.rs:*</exclude>
+                            <exclude>com.sun.jersey:*</exclude>
+                        </excludes>
+                    </artifactSet>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencyManagement>
+
+        <dependencies>
+            <!-- jQAssistant -->
+            <!-- unit tests -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>1.10.19</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
 
-        <!-- https://mvnrepository.com/artifact/com.atlassian.jira/jira-rest-java-client-core -->
+        <!-- https://mvnrepository.com/artifact/org.jdom/jdom2 -->
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom2</artifactId>
+            <version>2.0.6</version>
+        </dependency>
+
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-rest-java-client-core</artifactId>
-            <version>5.1.2-2bd0a62e</version>
+            <version>5.1.1-e0dd194</version>
         </dependency>
 
         <!-- This dependency is needed because the application will throw the following error on startup otherwise:-->
@@ -50,122 +161,89 @@
             <groupId>io.atlassian.fugue</groupId>
             <artifactId>fugue</artifactId>
             <version>4.7.2</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.2</version>
-            <scope>provided</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.jdom/jdom2 -->
         <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom2</artifactId>
-            <version>2.0.6</version>
+            <groupId>com.buschmais.jqassistant.plugin</groupId>
+            <artifactId>common</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.buschmais.jqassistant.core</groupId>
+            <artifactId>shared</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.buschmais.jqassistant.core</groupId>
             <artifactId>scanner</artifactId>
-            <version>1.4.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.buschmais.jqassistant.plugin</groupId>
-            <artifactId>common</artifactId>
-            <version>1.4</version>
+            <groupId>com.buschmais.jqassistant.core</groupId>
+            <artifactId>report</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Test dependencies -->
         <dependency>
             <groupId>com.buschmais.jqassistant.core</groupId>
             <artifactId>plugin</artifactId>
-            <version>1.4.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.buschmais.jqassistant.neo4jserver</groupId>
-            <artifactId>neo4jv3</artifactId>
-            <version>1.4.0</version>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.buschmais.jqassistant.plugin</groupId>
             <artifactId>common</artifactId>
             <type>test-jar</type>
-            <version>1.4</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.buschmais.jqassistant.core</groupId>
+            <artifactId>store</artifactId>
+            <type>test-jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.buschmais.jqassistant.core</groupId>
+            <artifactId>analysis</artifactId>
+            <type>test-jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.buschmais.xo</groupId>
+            <artifactId>xo.neo4j.embedded</artifactId>
+
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.buschmais.jqassistant.neo4jserver</groupId>
+            <artifactId>neo4jv3</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>java-hamcrest</artifactId>
+            <version>${org.hamcrest.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.13</version>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
-
+        <!-- Declared to detect ambiguities between data models of bytecode and src parser -->
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock-standalone</artifactId>
-            <version>2.18.0</version>
+            <groupId>com.buschmais.jqassistant.plugin</groupId>
+            <artifactId>java</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <!-- put your configurations here -->
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <formats>
-                        <format>html</format>
-                        <format>xml</format>
-                    </formats>
-                    <check/>
-                </configuration>
-            </plugin>
-
-            <!--https://spotbugs.readthedocs.io/en/latest/maven.html-->
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>3.1.3</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.github.spotbugs</groupId>
-                        <artifactId>spotbugs</artifactId>
-                        <version>3.1.3</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-        </plugins>
-    </build>
 </project>

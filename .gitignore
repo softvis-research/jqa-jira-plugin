@@ -11,3 +11,6 @@ run/
 test-project/
 jqassistant/store/
 jira-docker-data/
+
+# Local debugging
+local-jira-user.md

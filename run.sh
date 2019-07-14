@@ -12,7 +12,7 @@ echo 'Removing ./jqassistant ...'
 rm -r jqassistant
 
 echo 'Copying plugin jar into jQAssistant CLI ...'
-cp target/jqa-githubissues-plugin-*.jar run/jqassistant-commandline-neo4jv3-1.6.0/plugins/
+cp target/jqa-jira-plugin-*.jar run/jqassistant-commandline-neo4jv3-1.6.0/plugins/
 
 # Scan the test project
 run/jqassistant-commandline-neo4jv3-1.6.0/bin/jqassistant.sh scan -f run/jira-plugin-configuration.xml

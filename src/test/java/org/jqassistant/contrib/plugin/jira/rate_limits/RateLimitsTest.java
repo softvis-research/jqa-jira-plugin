@@ -18,7 +18,7 @@ import java.net.URI;
  * All three must be provided for this test.
  */
 @Slf4j
-public class CloudRateLimitsTest {
+public class RateLimitsTest {
 
     private final static String USERNAME = System.getenv("JIRA_USERNAME");
     private final static String PASSWORD = System.getenv("JIRA_PASSWORD");
