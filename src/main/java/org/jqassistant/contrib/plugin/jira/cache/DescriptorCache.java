@@ -18,6 +18,7 @@ class DescriptorCache {
     private HashMap<UserID, JiraUser> users;
     private HashMap<VersionID, JiraVersion> versions;
     private HashMap<ComponentID, JiraComponent> components;
+    private HashMap<IssueTypeID, JiraIssueType> issueTypes;
 
     DescriptorCache() {
 
@@ -26,6 +27,7 @@ class DescriptorCache {
         users = new HashMap<>();
         versions = new HashMap<>();
         components = new HashMap<>();
+        issueTypes = new HashMap<>();
     }
 
     JiraProject get(ProjectID projectID) {
@@ -85,6 +87,18 @@ class DescriptorCache {
 
         if (!components.containsKey(componentID)) {
             components.put(componentID, jiraComponent);
+        }
+    }
+
+    JiraIssueType get(IssueTypeID issueTypeID) {
+
+        return issueTypes.get(issueTypeID);
+    }
+
+    void put(JiraIssueType jiraIssueType, IssueTypeID issueTypeID) {
+
+        if (!issueTypes.containsKey(issueTypeID)) {
+            issueTypes.put(issueTypeID, jiraIssueType);
         }
     }
 }

@@ -5,7 +5,6 @@ import com.buschmais.jqassistant.core.store.api.Store;
 import org.joda.time.DateTime;
 import org.jqassistant.contrib.plugin.jira.ids.*;
 import org.jqassistant.contrib.plugin.jira.model.*;
-import org.neo4j.cypher.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,6 +160,34 @@ public class CacheEndpoint {
         }
 
         return jiraComponent;
+    }
+
+    public JiraIssueType findOrCreateIssueType(IssueType issueType) {
+
+        IssueTypeID issueTypeID = IssueTypeID.builder().jiraId(issueType.getId()).build();
+
+        JiraIssueType jiraIssueType = descriptorCache.get(issueTypeID);
+
+        if (jiraIssueType == null) {
+
+            jiraIssueType = store.create(JiraIssueType.class);
+
+            jiraIssueType.setSelf(issueType.getSelf().toString());
+            jiraIssueType.setJiraId(issueType.getId());
+
+            jiraIssueType.setDescription(issueType.getDescription());
+            jiraIssueType.setName(issueType.getName());
+
+            jiraIssueType.setSubtask(issueType.isSubtask());
+
+            if (issueType.getIconUri() != null) {
+                jiraIssueType.setIconUri(issueType.getIconUri().toString());
+            }
+
+            descriptorCache.put(jiraIssueType, issueTypeID);
+        }
+
+        return jiraIssueType;
     }
 
     /**

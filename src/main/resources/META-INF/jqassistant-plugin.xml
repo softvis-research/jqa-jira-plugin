@@ -14,6 +14,7 @@
         <class>org.jqassistant.contrib.plugin.jira.model.JiraUser</class>
         <class>org.jqassistant.contrib.plugin.jira.model.JiraVersion</class>
         <class>org.jqassistant.contrib.plugin.jira.model.JiraComponent</class>
+        <class>org.jqassistant.contrib.plugin.jira.model.JiraIssueType</class>
     </model>
     <scanner>
         <class>org.jqassistant.contrib.plugin.jira.scanner.JiraScannerPlugin</class>

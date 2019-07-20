@@ -33,4 +33,7 @@ public interface JiraProject extends Jira, JiraID, JiraDescription {
 
     @Relation("HAS_COMPONENT")
     List<JiraComponent> getComponents();
+
+    @Relation("DEFINES")
+    List<JiraIssueType> getIssueTypes();
 }

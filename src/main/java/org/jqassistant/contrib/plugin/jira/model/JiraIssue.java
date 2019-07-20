@@ -32,4 +32,8 @@ public interface JiraIssue extends Jira, JiraID, JiraAuditInformation, JiraDescr
 
     @Relation("CONCERNES")
     List<JiraComponent> getComponents();
+
+    @Relation("IS_OF_TYPE")
+    JiraIssueType getIssueType();
+    void setIssueType(JiraIssueType jiraIssueType);
 }

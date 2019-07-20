@@ -53,6 +53,12 @@ class GraphBuilder {
                 jiraProject.getVersions().add(jiraVersion);
             }
 
+            for (IssueType issueType : project.getIssueTypes()) {
+
+                JiraIssueType jiraIssueType = cacheEndpoint.findOrCreateIssueType(issueType);
+                jiraProject.getIssueTypes().add(jiraIssueType);
+            }
+
             resolveComponentsForProject(jiraProject, project.getComponents());
             resolveLeaderForProject(jiraProject, project.getLead().getSelf());
             issueLevel(jiraProject);
@@ -111,6 +117,11 @@ class GraphBuilder {
                 JiraComponent jiraComponent = cacheEndpoint.findComponentOrThrowException(basicComponent);
                 jiraIssue.getComponents().add(jiraComponent);
             }
+
+            // We already loaded every component for the current project but we can use the default method
+            // as we have not requesting overhead like for components.
+            JiraIssueType jiraIssueType = cacheEndpoint.findOrCreateIssueType(issue.getIssueType());
+            jiraIssue.setIssueType(jiraIssueType);
         }
     }
 }
