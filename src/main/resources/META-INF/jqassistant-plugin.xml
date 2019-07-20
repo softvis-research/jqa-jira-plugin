@@ -19,6 +19,7 @@
         <class>org.jqassistant.contrib.plugin.jira.model.JiraPriority</class>
         <class>org.jqassistant.contrib.plugin.jira.model.JiraStatus</class>
         <class>org.jqassistant.contrib.plugin.jira.model.JiraComment</class>
+        <class>org.jqassistant.contrib.plugin.jira.model.JiraIssueLink</class>
     </model>
     <scanner>
         <class>org.jqassistant.contrib.plugin.jira.scanner.JiraScannerPlugin</class>

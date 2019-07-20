@@ -282,6 +282,31 @@ public class CacheEndpoint {
         return jiraComment;
     }
 
+
+    public JiraIssueLink createIssueLink(IssueLink issueLink) {
+
+        JiraIssueLink jiraIssueLink = store.create(JiraIssueLink.class);
+
+        jiraIssueLink.setName(issueLink.getIssueLinkType().getName());
+        jiraIssueLink.setDescription(issueLink.getIssueLinkType().getDescription());
+
+        jiraIssueLink.setTargetIssueKey(issueLink.getTargetIssueKey());
+        jiraIssueLink.setTargetIssueUri(issueLink.getTargetIssueUri().toString());
+
+        return jiraIssueLink;
+    }
+
+    public JiraIssue findIssueOrThrowException(IssueID issueId) {
+
+        JiraIssue jiraIssue = descriptorCache.get(issueId);
+
+        if (jiraIssue == null) {
+            throw new IllegalArgumentException("We can't find a JiraIssue with ID: " + issueId);
+        }
+
+        return jiraIssue;
+    }
+
     /**
      * This solution was found here:
      * <p>

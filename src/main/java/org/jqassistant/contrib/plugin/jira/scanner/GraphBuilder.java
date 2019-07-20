@@ -4,6 +4,7 @@ import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.api.domain.*;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import org.jqassistant.contrib.plugin.jira.cache.CacheEndpoint;
+import org.jqassistant.contrib.plugin.jira.ids.IssueID;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraPluginConfiguration;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraProject;
 import org.jqassistant.contrib.plugin.jira.model.*;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Set;
 
 class GraphBuilder {
@@ -25,8 +27,11 @@ class GraphBuilder {
     private final JiraRestClient jiraRestClient;
     private final CacheEndpoint cacheEndpoint;
 
+    private final HashMap<IssueID, Iterable<IssueLink>> issueLinkCashe;
+
     GraphBuilder(XMLJiraPluginConfiguration xmlJiraPluginConfiguration, CacheEndpoint cacheEndpoint) {
 
+        this.issueLinkCashe = new HashMap<>();
         this.cacheEndpoint = cacheEndpoint;
 
         String url = xmlJiraPluginConfiguration.getUrl();
@@ -73,8 +78,10 @@ class GraphBuilder {
 
             resolveComponentsForProject(jiraProject, project.getComponents());
             resolveLeaderForProject(jiraProject, project.getLead().getSelf());
-            issueLevel(jiraProject);
+            resolveIssues(jiraProject);
         }
+
+        resolveIssueLinks();
     }
 
     private void resolveComponentsForProject(JiraProject jiraProject, Iterable<BasicComponent> basicComponentList) {
@@ -104,7 +111,7 @@ class GraphBuilder {
         jiraProject.setLeader(jiraUser);
     }
 
-    private void issueLevel(JiraProject jiraProject) {
+    private void resolveIssues(JiraProject jiraProject) {
 
         SearchResult searchResultIssuesForThisProject = jiraRestClient.getSearchClient().searchJql(String.format(JQL_ISSUE_QUERY, jiraProject.getKey()), -1, null, ALL_FIELDS).claim();
 
@@ -149,7 +156,7 @@ class GraphBuilder {
             }
 
             if (issue.getAffectedVersions() != null) {
-                for(Version version: issue.getAffectedVersions()) {
+                for (Version version : issue.getAffectedVersions()) {
 
                     JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
                     jiraIssue.getAffectedVersions().add(jiraVersion);
@@ -157,11 +164,16 @@ class GraphBuilder {
             }
 
             if (issue.getFixVersions() != null) {
-                for(Version version: issue.getFixVersions()) {
+                for (Version version : issue.getFixVersions()) {
 
                     JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
                     jiraIssue.getFixedVersions().add(jiraVersion);
                 }
+            }
+
+            if (issue.getIssueLinks() != null) {
+                IssueID issueID = IssueID.builder().jiraId(jiraIssue.getJiraId()).build();
+                issueLinkCashe.put(issueID, issue.getIssueLinks());
             }
         }
     }
@@ -185,5 +197,26 @@ class GraphBuilder {
         }
 
         jiraIssue.getComments().add(jiraComment);
+    }
+
+    private void resolveIssueLinks() {
+
+        for (IssueID issueID : issueLinkCashe.keySet()) {
+
+            for (IssueLink issueLink : issueLinkCashe.get(issueID)) {
+
+                JiraIssueLink jiraIssueLink = cacheEndpoint.createIssueLink(issueLink);
+
+                // This solution is a bit hacky.
+                // Have a look at IssueID.java to understand why this is necessary.
+                String targetIssueUri = issueLink.getTargetIssueUri().toString();
+                long targetIssueId = Long.valueOf(targetIssueUri.substring(targetIssueUri.lastIndexOf('/') + 1));
+
+                IssueID targetIssueID = IssueID.builder().jiraId(targetIssueId).build();
+                jiraIssueLink.setTargetIssue(cacheEndpoint.findIssueOrThrowException(targetIssueID));
+
+                cacheEndpoint.findIssueOrThrowException(issueID).getIssueLinks().add(jiraIssueLink);
+            }
+        }
     }
 }

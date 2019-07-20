@@ -57,4 +57,7 @@ public interface JiraIssue extends Jira, JiraID, JiraAuditInformation, JiraDescr
 
     @Relation("FIXES")
     List<JiraVersion> getFixedVersions();
+
+    @Relation("HAS_LINK")
+    List<JiraIssueLink> getIssueLinks();
 }
