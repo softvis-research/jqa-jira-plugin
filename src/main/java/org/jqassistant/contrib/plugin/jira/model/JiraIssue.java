@@ -51,4 +51,10 @@ public interface JiraIssue extends Jira, JiraID, JiraAuditInformation, JiraDescr
 
     @Relation("HAS_COMMENT")
     List<JiraComment> getComments();
+
+    @Relation("AFFECTS")
+    List<JiraVersion> getAffectedVersions();
+
+    @Relation("FIXES")
+    List<JiraVersion> getFixedVersions();
 }

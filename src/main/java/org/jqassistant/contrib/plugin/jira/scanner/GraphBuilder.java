@@ -147,6 +147,22 @@ class GraphBuilder {
             for (Comment comment : issue.getComments()) {
                 commentLevel(jiraIssue, comment);
             }
+
+            if (issue.getAffectedVersions() != null) {
+                for(Version version: issue.getAffectedVersions()) {
+
+                    JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
+                    jiraIssue.getAffectedVersions().add(jiraVersion);
+                }
+            }
+
+            if (issue.getFixVersions() != null) {
+                for(Version version: issue.getFixVersions()) {
+
+                    JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
+                    jiraIssue.getFixedVersions().add(jiraVersion);
+                }
+            }
         }
     }
 
