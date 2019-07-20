@@ -1,19 +1,11 @@
 package org.jqassistant.contrib.plugin.jira.cache;
 
-import com.atlassian.jira.rest.client.api.domain.Issue;
-import com.atlassian.jira.rest.client.api.domain.Project;
-import com.atlassian.jira.rest.client.api.domain.User;
-import com.atlassian.jira.rest.client.api.domain.Version;
+import com.atlassian.jira.rest.client.api.domain.*;
 import com.buschmais.jqassistant.core.store.api.Store;
 import org.joda.time.DateTime;
-import org.jqassistant.contrib.plugin.jira.ids.IssueID;
-import org.jqassistant.contrib.plugin.jira.ids.ProjectID;
-import org.jqassistant.contrib.plugin.jira.ids.UserID;
-import org.jqassistant.contrib.plugin.jira.ids.VersionID;
-import org.jqassistant.contrib.plugin.jira.model.JiraIssue;
-import org.jqassistant.contrib.plugin.jira.model.JiraProject;
-import org.jqassistant.contrib.plugin.jira.model.JiraUser;
-import org.jqassistant.contrib.plugin.jira.model.JiraVersion;
+import org.jqassistant.contrib.plugin.jira.ids.*;
+import org.jqassistant.contrib.plugin.jira.model.*;
+import org.neo4j.cypher.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,6 +126,41 @@ public class CacheEndpoint {
         }
 
         return jiraVersion;
+    }
+
+    public JiraComponent findOrCreateComponent(Component component) {
+
+        ComponentID componentID = ComponentID.builder().jiraId(component.getId()).build();
+
+        JiraComponent jiraComponent = descriptorCache.get(componentID);
+
+        if (jiraComponent == null) {
+
+            jiraComponent = store.create(JiraComponent.class);
+
+            jiraComponent.setSelf(component.getSelf().toString());
+            jiraComponent.setJiraId(component.getId());
+
+            jiraComponent.setDescription(component.getDescription());
+            jiraComponent.setName(component.getName());
+
+            descriptorCache.put(jiraComponent, componentID);
+        }
+
+        return jiraComponent;
+    }
+
+    public JiraComponent findComponentOrThrowException(BasicComponent basicComponent) {
+
+        ComponentID componentID = ComponentID.builder().jiraId(basicComponent.getId()).build();
+
+        JiraComponent jiraComponent = descriptorCache.get(componentID);
+
+        if (jiraComponent == null) {
+            throw new IllegalArgumentException("We can't find a JiraComponent with ID: " + componentID);
+        }
+
+        return jiraComponent;
     }
 
     /**

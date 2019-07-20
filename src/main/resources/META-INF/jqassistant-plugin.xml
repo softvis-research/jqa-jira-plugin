@@ -7,11 +7,13 @@
         <class>org.jqassistant.contrib.plugin.jira.model.JiraPluginConfigurationFile</class>
         <class>org.jqassistant.contrib.plugin.jira.model.JiraID</class>
         <class>org.jqassistant.contrib.plugin.jira.model.JiraAuditInformation</class>
+        <class>org.jqassistant.contrib.plugin.jira.model.JiraDescription</class>
 
         <class>org.jqassistant.contrib.plugin.jira.model.JiraProject</class>
         <class>org.jqassistant.contrib.plugin.jira.model.JiraIssue</class>
         <class>org.jqassistant.contrib.plugin.jira.model.JiraUser</class>
         <class>org.jqassistant.contrib.plugin.jira.model.JiraVersion</class>
+        <class>org.jqassistant.contrib.plugin.jira.model.JiraComponent</class>
     </model>
     <scanner>
         <class>org.jqassistant.contrib.plugin.jira.scanner.JiraScannerPlugin</class>

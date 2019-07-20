@@ -47,14 +47,30 @@ class GraphBuilder {
 
             jiraPluginConfigurationFile.getProjects().add(jiraProject);
 
-            for(Version version : project.getVersions()) {
+            for (Version version : project.getVersions()) {
 
                 JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
                 jiraProject.getVersions().add(jiraVersion);
             }
 
+            resolveComponentsForProject(jiraProject, project.getComponents());
             resolveLeaderForProject(jiraProject, project.getLead().getSelf());
             issueLevel(jiraProject);
+        }
+    }
+
+    private void resolveComponentsForProject(JiraProject jiraProject, Iterable<BasicComponent> basicComponentList) {
+
+        for (BasicComponent basicComponent : basicComponentList) {
+
+            Component component = jiraRestClient.getComponentClient().getComponent(basicComponent.getSelf()).claim();
+            JiraComponent jiraComponent = cacheEndpoint.findOrCreateComponent(component);
+
+            User componentLead = jiraRestClient.getUserClient().getUser(component.getLead().getSelf()).claim();
+            JiraUser jiraUser = cacheEndpoint.findOrCreateUser(componentLead);
+            jiraComponent.setLeader(jiraUser);
+
+            jiraProject.getComponents().add(jiraComponent);
         }
     }
 
@@ -67,7 +83,7 @@ class GraphBuilder {
         User projectLeadUser = jiraRestClient.getUserClient().getUser(projectLeadSelf).claim();
 
         JiraUser jiraUser = cacheEndpoint.findOrCreateUser(projectLeadUser);
-        jiraProject.setUser(jiraUser);
+        jiraProject.setLeader(jiraUser);
     }
 
     private void issueLevel(JiraProject jiraProject) {
@@ -88,6 +104,12 @@ class GraphBuilder {
             if (issue.getReporter() != null) {
                 JiraUser reporter = cacheEndpoint.findOrCreateUser(issue.getReporter());
                 jiraIssue.setReporter(reporter);
+            }
+
+            // We already loaded every component for the current project.
+            for (BasicComponent basicComponent : issue.getComponents()) {
+                JiraComponent jiraComponent = cacheEndpoint.findComponentOrThrowException(basicComponent);
+                jiraIssue.getComponents().add(jiraComponent);
             }
         }
     }

@@ -5,9 +5,10 @@ import com.buschmais.xo.neo4j.api.annotation.Property;
 import com.buschmais.xo.neo4j.api.annotation.Relation;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Label("Jira-Issue")
-public interface JiraIssue extends Jira, JiraID, JiraAuditInformation {
+public interface JiraIssue extends Jira, JiraID, JiraAuditInformation, JiraDescription {
 
     @Property("key")
     String getKey();
@@ -16,10 +17,6 @@ public interface JiraIssue extends Jira, JiraID, JiraAuditInformation {
     @Property("summary")
     String getSummary();
     void setSummary(String summary);
-
-    @Property("description")
-    String getDescription();
-    void setDescription(String description);
 
     @Property("dueDate")
     ZonedDateTime getDueDate();
@@ -32,4 +29,7 @@ public interface JiraIssue extends Jira, JiraID, JiraAuditInformation {
     @Relation("ASSIGNED_TO")
     JiraUser getAssignee();
     void setAssignee(JiraUser jiraUser);
+
+    @Relation("CONCERNES")
+    List<JiraComponent> getComponents();
 }

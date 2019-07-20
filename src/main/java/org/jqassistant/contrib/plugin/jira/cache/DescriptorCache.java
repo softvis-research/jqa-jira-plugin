@@ -1,14 +1,8 @@
 package org.jqassistant.contrib.plugin.jira.cache;
 
 
-import org.jqassistant.contrib.plugin.jira.ids.IssueID;
-import org.jqassistant.contrib.plugin.jira.ids.ProjectID;
-import org.jqassistant.contrib.plugin.jira.ids.UserID;
-import org.jqassistant.contrib.plugin.jira.ids.VersionID;
-import org.jqassistant.contrib.plugin.jira.model.JiraIssue;
-import org.jqassistant.contrib.plugin.jira.model.JiraProject;
-import org.jqassistant.contrib.plugin.jira.model.JiraUser;
-import org.jqassistant.contrib.plugin.jira.model.JiraVersion;
+import org.jqassistant.contrib.plugin.jira.ids.*;
+import org.jqassistant.contrib.plugin.jira.model.*;
 
 import java.util.HashMap;
 
@@ -23,6 +17,7 @@ class DescriptorCache {
     private HashMap<IssueID, JiraIssue> issues;
     private HashMap<UserID, JiraUser> users;
     private HashMap<VersionID, JiraVersion> versions;
+    private HashMap<ComponentID, JiraComponent> components;
 
     DescriptorCache() {
 
@@ -30,6 +25,7 @@ class DescriptorCache {
         issues = new HashMap<>();
         users = new HashMap<>();
         versions = new HashMap<>();
+        components = new HashMap<>();
     }
 
     JiraProject get(ProjectID projectID) {
@@ -77,6 +73,18 @@ class DescriptorCache {
 
         if (!versions.containsKey(versionID)) {
             versions.put(versionID, jiraVersion);
+        }
+    }
+
+    JiraComponent get(ComponentID componentID) {
+
+        return components.get(componentID);
+    }
+
+    void put(JiraComponent jiraComponent, ComponentID componentID) {
+
+        if (!components.containsKey(componentID)) {
+            components.put(componentID, jiraComponent);
         }
     }
 }

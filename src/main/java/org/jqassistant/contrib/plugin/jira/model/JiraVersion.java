@@ -6,15 +6,11 @@ import com.buschmais.xo.neo4j.api.annotation.Property;
 import java.time.ZonedDateTime;
 
 @Label("Jira-Version")
-public interface JiraVersion extends Jira, JiraID {
+public interface JiraVersion extends Jira, JiraID, JiraDescription {
 
     @Property("name")
     String getName();
     void setName(String name);
-
-    @Property("description")
-    String getDescription();
-    void setDescription(String description);
 
     @Property("isArchived")
     boolean isArchived();

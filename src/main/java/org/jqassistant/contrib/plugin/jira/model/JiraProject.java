@@ -7,7 +7,7 @@ import com.buschmais.xo.neo4j.api.annotation.Relation;
 import java.util.List;
 
 @Label("Jira-Project")
-public interface JiraProject extends Jira, JiraID {
+public interface JiraProject extends Jira, JiraID, JiraDescription {
 
     @Property("key")
     String getKey();
@@ -17,10 +17,6 @@ public interface JiraProject extends Jira, JiraID {
     String getName();
     void setName(String name);
 
-    @Property("description")
-    String getDescription();
-    void setDescription(String description);
-
     @Property("uri")
     String getUri();
     void setUri(String uri);
@@ -29,9 +25,12 @@ public interface JiraProject extends Jira, JiraID {
     List<JiraIssue> getIssues();
 
     @Relation("LEAD_BY")
-    JiraUser getUser();
-    void setUser(JiraUser jiraUser);
+    JiraUser getLeader();
+    void setLeader(JiraUser jiraUser);
 
     @Relation("HAS_VERSION")
     List<JiraVersion> getVersions();
+
+    @Relation("HAS_COMPONENT")
+    List<JiraComponent> getComponents();
 }
