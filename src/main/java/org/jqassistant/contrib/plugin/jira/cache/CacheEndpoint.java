@@ -3,14 +3,17 @@ package org.jqassistant.contrib.plugin.jira.cache;
 import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.rest.client.api.domain.Project;
 import com.atlassian.jira.rest.client.api.domain.User;
+import com.atlassian.jira.rest.client.api.domain.Version;
 import com.buschmais.jqassistant.core.store.api.Store;
 import org.joda.time.DateTime;
 import org.jqassistant.contrib.plugin.jira.ids.IssueID;
 import org.jqassistant.contrib.plugin.jira.ids.ProjectID;
 import org.jqassistant.contrib.plugin.jira.ids.UserID;
+import org.jqassistant.contrib.plugin.jira.ids.VersionID;
 import org.jqassistant.contrib.plugin.jira.model.JiraIssue;
 import org.jqassistant.contrib.plugin.jira.model.JiraProject;
 import org.jqassistant.contrib.plugin.jira.model.JiraUser;
+import org.jqassistant.contrib.plugin.jira.model.JiraVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +109,31 @@ public class CacheEndpoint {
         }
 
         return jiraUser;
+    }
+
+    public JiraVersion findOrCreateVersion(Version version) {
+
+        VersionID versionID = VersionID.builder().jiraId(version.getId()).build();
+
+        JiraVersion jiraVersion = descriptorCache.get(versionID);
+
+        if (jiraVersion == null) {
+
+            jiraVersion = store.create(JiraVersion.class);
+
+            jiraVersion.setSelf(version.getSelf().toString());
+            jiraVersion.setJiraId(version.getId());
+
+            jiraVersion.setDescription(version.getDescription());
+            jiraVersion.setName(version.getName());
+            jiraVersion.setArchived(version.isArchived());
+            jiraVersion.setReleased(version.isReleased());
+            jiraVersion.setReleaseDate(convertTime(version.getReleaseDate()));
+
+            descriptorCache.put(jiraVersion, versionID);
+        }
+
+        return jiraVersion;
     }
 
     /**

@@ -6,10 +6,7 @@ import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientF
 import org.jqassistant.contrib.plugin.jira.cache.CacheEndpoint;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraPluginConfiguration;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraProject;
-import org.jqassistant.contrib.plugin.jira.model.JiraIssue;
-import org.jqassistant.contrib.plugin.jira.model.JiraPluginConfigurationFile;
-import org.jqassistant.contrib.plugin.jira.model.JiraProject;
-import org.jqassistant.contrib.plugin.jira.model.JiraUser;
+import org.jqassistant.contrib.plugin.jira.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +46,12 @@ class GraphBuilder {
             JiraProject jiraProject = cacheEndpoint.findOrCreateProject(project);
 
             jiraPluginConfigurationFile.getProjects().add(jiraProject);
+
+            for(Version version : project.getVersions()) {
+
+                JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
+                jiraProject.getVersions().add(jiraVersion);
+            }
 
             resolveLeaderForProject(jiraProject, project.getLead().getSelf());
             issueLevel(jiraProject);
