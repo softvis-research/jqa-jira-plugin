@@ -3,6 +3,10 @@
 This is a [Jira](https://www.atlassian.com/software/jira) parser for [jQAssistant](https://jqassistant.org/). 
 It enables jQAssistant to scan and to analyze data from **Jira**.
 
+## Model
+
+![Neo4J model for the jQAssistant Jira plugin](./model.jpg)
+
 ## Contribute
 
 ### Local Jira Server
