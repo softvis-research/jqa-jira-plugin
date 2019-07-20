@@ -48,4 +48,7 @@ public interface JiraIssue extends Jira, JiraID, JiraAuditInformation, JiraDescr
     @Relation("HAS_STATUS")
     JiraStatus getStatus();
     void setStatus(JiraStatus jiraStatus);
+
+    @Relation("HAS_COMMENT")
+    List<JiraComment> getComments();
 }

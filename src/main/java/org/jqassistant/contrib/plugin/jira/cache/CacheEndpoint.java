@@ -257,6 +257,31 @@ public class CacheEndpoint {
         return jiraStatus;
     }
 
+    public JiraComment findOrCreateComment(Comment comment) {
+
+        CommentID commentID = CommentID.builder().jiraId(comment.getId()).build();
+
+        JiraComment jiraComment = descriptorCache.get(commentID);
+
+        if (jiraComment == null) {
+
+            jiraComment = store.create(JiraComment.class);
+
+            jiraComment.setSelf(comment.getSelf().toString());
+            jiraComment.setJiraId(comment.getId());
+
+            jiraComment.setCreationDate(convertTime(comment.getCreationDate()));
+            jiraComment.setUpdateDate(convertTime(comment.getUpdateDate()));
+
+            jiraComment.setBody(comment.getBody());
+
+
+            descriptorCache.put(jiraComment, commentID);
+        }
+
+        return jiraComment;
+    }
+
     /**
      * This solution was found here:
      * <p>

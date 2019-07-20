@@ -143,6 +143,31 @@ class GraphBuilder {
 
             JiraStatus jiraStatus = cacheEndpoint.findOrCreateStatus(issue.getStatus());
             jiraIssue.setStatus(jiraStatus);
+
+            for (Comment comment : issue.getComments()) {
+                commentLevel(jiraIssue, comment);
+            }
         }
+    }
+
+    private void commentLevel(JiraIssue jiraIssue, Comment comment) {
+
+        JiraComment jiraComment = cacheEndpoint.findOrCreateComment(comment);
+
+        if (comment.getAuthor() != null) {
+
+            User commentAuthor = jiraRestClient.getUserClient().getUser(comment.getAuthor().getSelf()).claim();
+            JiraUser jiraUser = cacheEndpoint.findOrCreateUser(commentAuthor);
+            jiraComment.setAuthor(jiraUser);
+        }
+
+        if (comment.getUpdateAuthor() != null) {
+
+            User commentUpdateAuthor = jiraRestClient.getUserClient().getUser(comment.getUpdateAuthor().getSelf()).claim();
+            JiraUser jiraUser = cacheEndpoint.findOrCreateUser(commentUpdateAuthor);
+            jiraComment.setUpdateAuthor(jiraUser);
+        }
+
+        jiraIssue.getComments().add(jiraComment);
     }
 }
