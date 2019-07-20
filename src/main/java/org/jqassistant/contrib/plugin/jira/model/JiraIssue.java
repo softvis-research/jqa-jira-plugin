@@ -2,6 +2,7 @@ package org.jqassistant.contrib.plugin.jira.model;
 
 import com.buschmais.xo.neo4j.api.annotation.Label;
 import com.buschmais.xo.neo4j.api.annotation.Property;
+import com.buschmais.xo.neo4j.api.annotation.Relation;
 
 import java.time.ZonedDateTime;
 
@@ -23,4 +24,12 @@ public interface JiraIssue extends Jira, JiraID, JiraAuditInformation {
     @Property("dueDate")
     ZonedDateTime getDueDate();
     void setDueDate(ZonedDateTime dueDate);
+
+    @Relation("REPORTED_BY")
+    JiraUser getReporter();
+    void setReporter(JiraUser jiraUser);
+
+    @Relation("ASSIGNED_TO")
+    JiraUser getAssignee();
+    void setAssignee(JiraUser jiraUser);
 }

@@ -3,8 +3,10 @@ package org.jqassistant.contrib.plugin.jira.cache;
 
 import org.jqassistant.contrib.plugin.jira.ids.IssueID;
 import org.jqassistant.contrib.plugin.jira.ids.ProjectID;
+import org.jqassistant.contrib.plugin.jira.ids.UserID;
 import org.jqassistant.contrib.plugin.jira.model.JiraIssue;
 import org.jqassistant.contrib.plugin.jira.model.JiraProject;
+import org.jqassistant.contrib.plugin.jira.model.JiraUser;
 
 import java.util.HashMap;
 
@@ -17,11 +19,13 @@ class DescriptorCache {
 
     private HashMap<ProjectID, JiraProject> projects;
     private HashMap<IssueID, JiraIssue> issues;
+    private HashMap<UserID, JiraUser> users;
 
     DescriptorCache() {
 
         projects = new HashMap<>();
         issues = new HashMap<>();
+        users = new HashMap<>();
     }
 
     JiraProject get(ProjectID projectID) {
@@ -45,6 +49,18 @@ class DescriptorCache {
 
         if (!issues.containsKey(issueID)) {
             issues.put(issueID, jiraIssue);
+        }
+    }
+
+    JiraUser get(UserID userID) {
+
+        return users.get(userID);
+    }
+
+    void put(JiraUser jiraUser, UserID userID) {
+
+        if (!users.containsKey(userID)) {
+            users.put(userID, jiraUser);
         }
     }
 }

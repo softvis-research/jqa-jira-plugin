@@ -27,4 +27,8 @@ public interface JiraProject extends Jira, JiraID {
 
     @Relation("CONTAINS")
     List<JiraIssue> getIssues();
+
+    @Relation("LEAD_BY")
+    JiraUser getUser();
+    void setUser(JiraUser jiraUser);
 }

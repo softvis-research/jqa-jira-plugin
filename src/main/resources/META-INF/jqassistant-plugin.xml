@@ -10,6 +10,7 @@
 
         <class>org.jqassistant.contrib.plugin.jira.model.JiraProject</class>
         <class>org.jqassistant.contrib.plugin.jira.model.JiraIssue</class>
+        <class>org.jqassistant.contrib.plugin.jira.model.JiraUser</class>
     </model>
     <scanner>
         <class>org.jqassistant.contrib.plugin.jira.scanner.JiraScannerPlugin</class>

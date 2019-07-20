@@ -2,12 +2,15 @@ package org.jqassistant.contrib.plugin.jira.cache;
 
 import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.rest.client.api.domain.Project;
+import com.atlassian.jira.rest.client.api.domain.User;
 import com.buschmais.jqassistant.core.store.api.Store;
 import org.joda.time.DateTime;
 import org.jqassistant.contrib.plugin.jira.ids.IssueID;
 import org.jqassistant.contrib.plugin.jira.ids.ProjectID;
+import org.jqassistant.contrib.plugin.jira.ids.UserID;
 import org.jqassistant.contrib.plugin.jira.model.JiraIssue;
 import org.jqassistant.contrib.plugin.jira.model.JiraProject;
+import org.jqassistant.contrib.plugin.jira.model.JiraUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +84,30 @@ public class CacheEndpoint {
         return jiraIssue;
     }
 
+
+    public JiraUser findOrCreateUser(User user) {
+
+        UserID userID = UserID.builder().name(user.getName()).build();
+
+        JiraUser jiraUser = descriptorCache.get(userID);
+
+        if (jiraUser == null) {
+
+            jiraUser = store.create(JiraUser.class);
+
+            jiraUser.setSelf(user.getSelf().toString());
+            jiraUser.setDisplayName(user.getDisplayName());
+
+            jiraUser.setEmailAddress(user.getEmailAddress());
+            jiraUser.setName(user.getName());
+            jiraUser.setActive(user.isActive());
+
+            descriptorCache.put(jiraUser, userID);
+        }
+
+        return jiraUser;
+    }
+
     /**
      * This solution was found here:
      * <p>
@@ -109,4 +136,5 @@ public class CacheEndpoint {
                 ZoneId.of(dateTime.getZone().getID(), ZoneId.SHORT_IDS),
                 ZoneOffset.ofTotalSeconds(dateTime.getZone().getOffset(dateTime) / 1000));
     }
+
 }
