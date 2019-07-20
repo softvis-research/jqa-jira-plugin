@@ -6,8 +6,10 @@
         <class>org.jqassistant.contrib.plugin.jira.model.Jira</class>
         <class>org.jqassistant.contrib.plugin.jira.model.JiraPluginConfigurationFile</class>
         <class>org.jqassistant.contrib.plugin.jira.model.JiraID</class>
+        <class>org.jqassistant.contrib.plugin.jira.model.JiraAuditInformation</class>
 
         <class>org.jqassistant.contrib.plugin.jira.model.JiraProject</class>
+        <class>org.jqassistant.contrib.plugin.jira.model.JiraIssue</class>
     </model>
     <scanner>
         <class>org.jqassistant.contrib.plugin.jira.scanner.JiraScannerPlugin</class>

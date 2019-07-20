@@ -2,6 +2,9 @@ package org.jqassistant.contrib.plugin.jira.model;
 
 import com.buschmais.xo.neo4j.api.annotation.Label;
 import com.buschmais.xo.neo4j.api.annotation.Property;
+import com.buschmais.xo.neo4j.api.annotation.Relation;
+
+import java.util.List;
 
 @Label("Jira-Project")
 public interface JiraProject extends Jira, JiraID {
@@ -21,4 +24,7 @@ public interface JiraProject extends Jira, JiraID {
     @Property("uri")
     String getUri();
     void setUri(String uri);
+
+    @Relation("CONTAINS")
+    List<JiraIssue> getIssues();
 }
