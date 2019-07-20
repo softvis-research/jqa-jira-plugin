@@ -10,7 +10,7 @@ import org.jdom2.JDOMException;
 import org.jqassistant.contrib.plugin.jira.cache.CacheEndpoint;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraPluginConfiguration;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLParser;
-import org.jqassistant.contrib.plugin.jira.model.JiraPluginConfigurationFile;
+import org.jqassistant.contrib.plugin.jira.model.JiraServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,7 @@ import java.io.IOException;
  * Furthermore, it starts the scan process with its {@link #scan(FileResource, String, Scope, Scanner)} method.
  */
 @ScannerPlugin.Requires(FileDescriptor.class)
-public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraPluginConfigurationFile> {
+public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraServer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JiraScannerPlugin.class);
 
@@ -79,18 +79,18 @@ public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraP
      * @throws IOException If the application can't open a file stream for the configuration file.
      */
     @Override
-    public JiraPluginConfigurationFile scan(FileResource item, String path, Scope scope, Scanner scanner) throws IOException {
+    public JiraServer scan(FileResource item, String path, Scope scope, Scanner scanner) throws IOException {
 
         LOGGER.debug("Jira plugin scans file '{}'.", path);
 
         XMLJiraPluginConfiguration xmlJiraPluginConfiguration = this.readConfigurationFile(item);
 
-        final JiraPluginConfigurationFile jiraPluginConfigurationFile = this.createRootDescriptor(scanner);
+        final JiraServer jiraServer = this.createRootDescriptor(scanner);
 
         CacheEndpoint cacheEndpoint = new CacheEndpoint(getScannerContext().getStore());
-        this.buildCompleteDescriptorGraph(jiraPluginConfigurationFile, xmlJiraPluginConfiguration, cacheEndpoint);
+        this.buildCompleteDescriptorGraph(jiraServer, xmlJiraPluginConfiguration, cacheEndpoint);
 
-        return jiraPluginConfigurationFile;
+        return jiraServer;
     }
 
     private XMLJiraPluginConfiguration readConfigurationFile(FileResource fileResource) throws IOException {
@@ -105,16 +105,16 @@ public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraP
         }
     }
 
-    private JiraPluginConfigurationFile createRootDescriptor(Scanner scanner) {
+    private JiraServer createRootDescriptor(Scanner scanner) {
 
         FileDescriptor fileDescriptor = scanner.getContext().getCurrentDescriptor();
         return scanner
                 .getContext()
                 .getStore()
-                .addDescriptorType(fileDescriptor, JiraPluginConfigurationFile.class);
+                .addDescriptorType(fileDescriptor, JiraServer.class);
     }
 
-    private void buildCompleteDescriptorGraph(JiraPluginConfigurationFile jiraPluginConfigurationFile,
+    private void buildCompleteDescriptorGraph(JiraServer jiraServer,
                                               XMLJiraPluginConfiguration xmlJiraPluginConfiguration,
                                               CacheEndpoint cacheEndpoint) {
 
@@ -124,7 +124,7 @@ public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraP
         // Instead it will log:
         // Exception in thread "main" com.buschmais.xo.api.XOException: There is no existing transaction.
         try {
-            graphBuilder.startTraversal(jiraPluginConfigurationFile, xmlJiraPluginConfiguration);
+            graphBuilder.startTraversal(jiraServer, xmlJiraPluginConfiguration);
         } catch(Exception e) {
             e.printStackTrace();
             LOGGER.error(e.getMessage());

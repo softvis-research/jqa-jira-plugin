@@ -4,7 +4,7 @@
     <description>Provides a scanner for Jira.</description>
     <model>
         <class>org.jqassistant.contrib.plugin.jira.model.basic.Jira</class>
-        <class>org.jqassistant.contrib.plugin.jira.model.JiraPluginConfigurationFile</class>
+        <class>org.jqassistant.contrib.plugin.jira.model.JiraServer</class>
         <class>org.jqassistant.contrib.plugin.jira.model.basic.JiraID</class>
         <class>org.jqassistant.contrib.plugin.jira.model.basic.JiraAuditInformation</class>
         <class>org.jqassistant.contrib.plugin.jira.model.basic.JiraDescription</class>

@@ -307,6 +307,7 @@ public class CacheEndpoint {
         return jiraIssue;
     }
 
+
     /**
      * This solution was found here:
      * <p>
@@ -317,7 +318,7 @@ public class CacheEndpoint {
      * @param dateTime The joda-time time which shall be converted.
      * @return The same time as ZonedDateTime.
      */
-    private ZonedDateTime convertTime(DateTime dateTime) {
+    public static ZonedDateTime convertTime(DateTime dateTime) {
 
         if (dateTime == null) {
             return null;

@@ -42,19 +42,28 @@ class GraphBuilder {
                 .createWithBasicHttpAuthentication(URI.create(url), username, password);
     }
 
-    void startTraversal(final JiraPluginConfigurationFile jiraPluginConfigurationFile,
+    void startTraversal(final JiraServer jiraServer,
                         final XMLJiraPluginConfiguration xmlJiraPluginConfiguration) {
+
+        ServerInfo serverInfo = jiraRestClient.getMetadataClient().getServerInfo().claim();
+        jiraServer.setBaseUri(serverInfo.getBaseUri().toString());
+        jiraServer.setVersion(serverInfo.getVersion());
+        jiraServer.setBuildNumber(serverInfo.getBuildNumber());
+        jiraServer.setBuildDate(CacheEndpoint.convertTime(serverInfo.getBuildDate()));
+        jiraServer.setServerTime(CacheEndpoint.convertTime(serverInfo.getServerTime()));
+        jiraServer.setScmInfo(serverInfo.getScmInfo());
+        jiraServer.setServerTitle(serverInfo.getServerTitle());
 
         for (Priority priority : jiraRestClient.getMetadataClient().getPriorities().claim()) {
 
             JiraPriority jiraPriority = cacheEndpoint.findOrCreatePriority(priority);
-            jiraPluginConfigurationFile.getPriorities().add(jiraPriority);
+            jiraServer.getPriorities().add(jiraPriority);
         }
 
         for (Status status : jiraRestClient.getMetadataClient().getStatuses().claim()) {
 
             JiraStatus jiraStatus = cacheEndpoint.findOrCreateStatus(status);
-            jiraPluginConfigurationFile.getStatuses().add(jiraStatus);
+            jiraServer.getStatuses().add(jiraStatus);
         }
 
         for (XMLJiraProject xmlJiraProject : xmlJiraPluginConfiguration.getProjects()) {
@@ -62,7 +71,7 @@ class GraphBuilder {
             Project project = jiraRestClient.getProjectClient().getProject(xmlJiraProject.getKey()).claim();
             JiraProject jiraProject = cacheEndpoint.findOrCreateProject(project);
 
-            jiraPluginConfigurationFile.getProjects().add(jiraProject);
+            jiraServer.getProjects().add(jiraProject);
 
             for (Version version : project.getVersions()) {
 
