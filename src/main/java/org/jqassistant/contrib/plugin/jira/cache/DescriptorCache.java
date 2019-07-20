@@ -19,6 +19,7 @@ class DescriptorCache {
     private HashMap<VersionID, JiraVersion> versions;
     private HashMap<ComponentID, JiraComponent> components;
     private HashMap<IssueTypeID, JiraIssueType> issueTypes;
+    private HashMap<PriorityID, JiraPriority> priorities;
 
     DescriptorCache() {
 
@@ -28,6 +29,7 @@ class DescriptorCache {
         versions = new HashMap<>();
         components = new HashMap<>();
         issueTypes = new HashMap<>();
+        priorities = new HashMap<>();
     }
 
     JiraProject get(ProjectID projectID) {
@@ -99,6 +101,18 @@ class DescriptorCache {
 
         if (!issueTypes.containsKey(issueTypeID)) {
             issueTypes.put(issueTypeID, jiraIssueType);
+        }
+    }
+
+    JiraPriority get(PriorityID priorityID) {
+
+        return priorities.get(priorityID);
+    }
+
+    void put(JiraPriority jiraPriority, PriorityID priorityID) {
+
+        if (!priorities.containsKey(priorityID)) {
+            priorities.put(priorityID, jiraPriority);
         }
     }
 }

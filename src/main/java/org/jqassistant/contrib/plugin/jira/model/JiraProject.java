@@ -3,19 +3,19 @@ package org.jqassistant.contrib.plugin.jira.model;
 import com.buschmais.xo.neo4j.api.annotation.Label;
 import com.buschmais.xo.neo4j.api.annotation.Property;
 import com.buschmais.xo.neo4j.api.annotation.Relation;
+import org.jqassistant.contrib.plugin.jira.model.basic.Jira;
+import org.jqassistant.contrib.plugin.jira.model.basic.JiraDescription;
+import org.jqassistant.contrib.plugin.jira.model.basic.JiraID;
+import org.jqassistant.contrib.plugin.jira.model.basic.JiraName;
 
 import java.util.List;
 
 @Label("Jira-Project")
-public interface JiraProject extends Jira, JiraID, JiraDescription {
+public interface JiraProject extends Jira, JiraID, JiraName, JiraDescription {
 
     @Property("key")
     String getKey();
     void setKey(String key);
-
-    @Property("name")
-    String getName();
-    void setName(String name);
 
     @Property("uri")
     String getUri();

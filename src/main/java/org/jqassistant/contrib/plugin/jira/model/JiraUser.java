@@ -2,12 +2,11 @@ package org.jqassistant.contrib.plugin.jira.model;
 
 import com.buschmais.xo.neo4j.api.annotation.Label;
 import com.buschmais.xo.neo4j.api.annotation.Property;
-import com.buschmais.xo.neo4j.api.annotation.Relation;
-
-import java.util.List;
+import org.jqassistant.contrib.plugin.jira.model.basic.Jira;
+import org.jqassistant.contrib.plugin.jira.model.basic.JiraName;
 
 @Label("Jira-User")
-public interface JiraUser extends Jira {
+public interface JiraUser extends Jira, JiraName {
 
     @Property("self")
     String getSelf();
@@ -20,10 +19,6 @@ public interface JiraUser extends Jira {
     @Property("emailAddress")
     String getEmailAddress();
     void setEmailAddress(String emailAddress);
-
-    @Property("name")
-    String getName();
-    void setName(String name);
 
     @Property("active")
     boolean isActive();

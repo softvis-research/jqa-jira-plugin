@@ -40,6 +40,12 @@ class GraphBuilder {
     void startTraversal(final JiraPluginConfigurationFile jiraPluginConfigurationFile,
                         final XMLJiraPluginConfiguration xmlJiraPluginConfiguration) {
 
+        for(Priority priority: jiraRestClient.getMetadataClient().getPriorities().claim()) {
+
+            JiraPriority jiraPriority = cacheEndpoint.findOrCreatePriority(priority);
+            jiraPluginConfigurationFile.getPriorities().add(jiraPriority);
+        }
+
         for (XMLJiraProject xmlJiraProject : xmlJiraPluginConfiguration.getProjects()) {
 
             Project project = jiraRestClient.getProjectClient().getProject(xmlJiraProject.getKey()).claim();
@@ -122,6 +128,13 @@ class GraphBuilder {
             // as we have not requesting overhead like for components.
             JiraIssueType jiraIssueType = cacheEndpoint.findOrCreateIssueType(issue.getIssueType());
             jiraIssue.setIssueType(jiraIssueType);
+
+            if (issue.getPriority() != null) {
+
+                JiraPriority jiraPriority = cacheEndpoint.findPriorityOrThrowException(issue.getPriority());
+                jiraIssue.setPriority(jiraPriority);
+            }
+
         }
     }
 }

@@ -190,6 +190,47 @@ public class CacheEndpoint {
         return jiraIssueType;
     }
 
+    public JiraPriority findOrCreatePriority(Priority priority) {
+
+        PriorityID priorityID = PriorityID.builder().jiraId(priority.getId()).build();
+
+        JiraPriority jiraPriority = descriptorCache.get(priorityID);
+
+        if (jiraPriority == null) {
+
+            jiraPriority = store.create(JiraPriority.class);
+
+            jiraPriority.setSelf(priority.getSelf().toString());
+            jiraPriority.setJiraId(priority.getId());
+
+            jiraPriority.setDescription(priority.getDescription());
+            jiraPriority.setName(priority.getName());
+
+            jiraPriority.setStatusColor(priority.getStatusColor());
+
+            if (priority.getIconUri() != null) {
+                jiraPriority.setIconUrl(priority.getIconUri().toString());
+            }
+
+            descriptorCache.put(jiraPriority, priorityID);
+        }
+
+        return jiraPriority;
+    }
+
+    public JiraPriority findPriorityOrThrowException(BasicPriority basicPriority) {
+
+        PriorityID priorityID = PriorityID.builder().jiraId(basicPriority.getId()).build();
+
+        JiraPriority jiraPriority = descriptorCache.get(priorityID);
+
+        if (jiraPriority == null) {
+            throw new IllegalArgumentException("We can't find a JiraPriority with ID: " + priorityID);
+        }
+
+        return jiraPriority;
+    }
+
     /**
      * This solution was found here:
      * <p>

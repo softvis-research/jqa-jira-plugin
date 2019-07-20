@@ -1,16 +1,20 @@
 package org.jqassistant.contrib.plugin.jira.model;
 
 import com.buschmais.xo.neo4j.api.annotation.Label;
-import com.buschmais.xo.neo4j.api.annotation.Relation;
+import com.buschmais.xo.neo4j.api.annotation.Property;
 import org.jqassistant.contrib.plugin.jira.model.basic.Jira;
 import org.jqassistant.contrib.plugin.jira.model.basic.JiraDescription;
 import org.jqassistant.contrib.plugin.jira.model.basic.JiraID;
 import org.jqassistant.contrib.plugin.jira.model.basic.JiraName;
 
-@Label("Jira-Component")
-public interface JiraComponent extends Jira, JiraID, JiraName, JiraDescription {
+@Label("Jira-Priority")
+public interface JiraPriority extends Jira, JiraID, JiraName, JiraDescription {
 
-    @Relation("LEAD_BY")
-    JiraUser getLeader();
-    void setLeader(JiraUser jiraUser);
+    @Property("statusColor")
+    String getStatusColor();
+    void setStatusColor(String statusColor);
+
+    @Property("iconUrl")
+    String getIconUrl();
+    void setIconUrl(String iconUrl);
 }
