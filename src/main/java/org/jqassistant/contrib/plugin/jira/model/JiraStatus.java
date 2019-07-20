@@ -7,12 +7,8 @@ import org.jqassistant.contrib.plugin.jira.model.basic.JiraDescription;
 import org.jqassistant.contrib.plugin.jira.model.basic.JiraID;
 import org.jqassistant.contrib.plugin.jira.model.basic.JiraName;
 
-@Label("Jira-Priority")
-public interface JiraPriority extends Jira, JiraID, JiraName, JiraDescription {
-
-    @Property("statusColor")
-    String getStatusColor();
-    void setStatusColor(String statusColor);
+@Label("Jira-Status")
+public interface JiraStatus extends Jira, JiraID, JiraName, JiraDescription {
 
     @Property("iconUri")
     String getIconUri();

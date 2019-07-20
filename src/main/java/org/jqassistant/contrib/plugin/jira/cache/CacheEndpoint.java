@@ -209,7 +209,7 @@ public class CacheEndpoint {
             jiraPriority.setStatusColor(priority.getStatusColor());
 
             if (priority.getIconUri() != null) {
-                jiraPriority.setIconUrl(priority.getIconUri().toString());
+                jiraPriority.setIconUri(priority.getIconUri().toString());
             }
 
             descriptorCache.put(jiraPriority, priorityID);
@@ -229,6 +229,32 @@ public class CacheEndpoint {
         }
 
         return jiraPriority;
+    }
+
+    public JiraStatus findOrCreateStatus(Status status) {
+
+        StatusID statusID = StatusID.builder().jiraId(status.getId()).build();
+
+        JiraStatus jiraStatus = descriptorCache.get(statusID);
+
+        if (jiraStatus == null) {
+
+            jiraStatus = store.create(JiraStatus.class);
+
+            jiraStatus.setSelf(status.getSelf().toString());
+            jiraStatus.setJiraId(status.getId());
+
+            jiraStatus.setDescription(status.getDescription());
+            jiraStatus.setName(status.getName());
+
+            if (status.getIconUrl() != null) {
+                jiraStatus.setIconUri(status.getIconUrl().toString());
+            }
+
+            descriptorCache.put(jiraStatus, statusID);
+        }
+
+        return jiraStatus;
     }
 
     /**

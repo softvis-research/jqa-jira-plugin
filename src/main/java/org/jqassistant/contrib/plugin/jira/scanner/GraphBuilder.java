@@ -40,10 +40,16 @@ class GraphBuilder {
     void startTraversal(final JiraPluginConfigurationFile jiraPluginConfigurationFile,
                         final XMLJiraPluginConfiguration xmlJiraPluginConfiguration) {
 
-        for(Priority priority: jiraRestClient.getMetadataClient().getPriorities().claim()) {
+        for (Priority priority : jiraRestClient.getMetadataClient().getPriorities().claim()) {
 
             JiraPriority jiraPriority = cacheEndpoint.findOrCreatePriority(priority);
             jiraPluginConfigurationFile.getPriorities().add(jiraPriority);
+        }
+
+        for (Status status : jiraRestClient.getMetadataClient().getStatuses().claim()) {
+
+            JiraStatus jiraStatus = cacheEndpoint.findOrCreateStatus(status);
+            jiraPluginConfigurationFile.getStatuses().add(jiraStatus);
         }
 
         for (XMLJiraProject xmlJiraProject : xmlJiraPluginConfiguration.getProjects()) {
@@ -135,6 +141,8 @@ class GraphBuilder {
                 jiraIssue.setPriority(jiraPriority);
             }
 
+            JiraStatus jiraStatus = cacheEndpoint.findOrCreateStatus(issue.getStatus());
+            jiraIssue.setStatus(jiraStatus);
         }
     }
 }

@@ -15,4 +15,7 @@ public interface JiraPluginConfigurationFile extends Jira, FileDescriptor {
 
     @Relation("SPECIFIES")
     List<JiraPriority> getPriorities();
+
+    @Relation("SPECIFIES")
+    List<JiraStatus> getStatuses();
 }

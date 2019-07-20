@@ -20,6 +20,7 @@ class DescriptorCache {
     private HashMap<ComponentID, JiraComponent> components;
     private HashMap<IssueTypeID, JiraIssueType> issueTypes;
     private HashMap<PriorityID, JiraPriority> priorities;
+    private HashMap<StatusID, JiraStatus> statuses;
 
     DescriptorCache() {
 
@@ -30,6 +31,7 @@ class DescriptorCache {
         components = new HashMap<>();
         issueTypes = new HashMap<>();
         priorities = new HashMap<>();
+        statuses = new HashMap<>();
     }
 
     JiraProject get(ProjectID projectID) {
@@ -113,6 +115,18 @@ class DescriptorCache {
 
         if (!priorities.containsKey(priorityID)) {
             priorities.put(priorityID, jiraPriority);
+        }
+    }
+
+    JiraStatus get(StatusID statusID) {
+
+        return statuses.get(statusID);
+    }
+
+    void put(JiraStatus jiraStatus, StatusID statusID) {
+
+        if (!statuses.containsKey(statusID)) {
+            statuses.put(statusID, jiraStatus);
         }
     }
 }

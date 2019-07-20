@@ -44,4 +44,8 @@ public interface JiraIssue extends Jira, JiraID, JiraAuditInformation, JiraDescr
     @Relation("IS_OF_PRIORITY")
     JiraPriority getPriority();
     void setPriority(JiraPriority jiraPriority);
+
+    @Relation("HAS_STATUS")
+    JiraStatus getStatus();
+    void setStatus(JiraStatus jiraStatus);
 }
