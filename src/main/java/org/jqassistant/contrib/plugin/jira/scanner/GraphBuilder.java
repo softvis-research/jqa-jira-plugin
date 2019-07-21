@@ -32,10 +32,12 @@ public class GraphBuilder {
     private final CacheEndpoint cacheEndpoint;
 
     private final HashMap<IssueID, Iterable<IssueLink>> issueLinkCashe;
+    private final HashMap<IssueID, Iterable<Subtask>> subtaskCashe;
 
     GraphBuilder(XMLJiraPluginConfiguration xmlJiraPluginConfiguration, CacheEndpoint cacheEndpoint) {
 
         this.issueLinkCashe = new HashMap<>();
+        this.subtaskCashe = new HashMap<>();
         this.cacheEndpoint = cacheEndpoint;
 
         String url = xmlJiraPluginConfiguration.getUrl();
@@ -98,6 +100,7 @@ public class GraphBuilder {
         }
 
         resolveIssueLinks();
+        resolveSubtaskRealations();
     }
 
     private void resolveComponentsForProject(JiraProject jiraProject, Iterable<BasicComponent> basicComponentList) {
@@ -189,6 +192,11 @@ public class GraphBuilder {
                 IssueID issueID = IssueID.builder().jiraId(jiraIssue.getJiraId()).build();
                 issueLinkCashe.put(issueID, issue.getIssueLinks());
             }
+
+            if (issue.getSubtasks() != null) {
+                IssueID issueID = IssueID.builder().jiraId(jiraIssue.getJiraId()).build();
+                subtaskCashe.put(issueID, issue.getSubtasks());
+            }
         }
     }
 
@@ -230,6 +238,25 @@ public class GraphBuilder {
                 jiraIssueLink.setTargetIssue(cacheEndpoint.findIssueOrThrowException(targetIssueID));
 
                 cacheEndpoint.findIssueOrThrowException(issueID).getIssueLinks().add(jiraIssueLink);
+            }
+        }
+    }
+
+    private void resolveSubtaskRealations() {
+
+        for (IssueID issueID : subtaskCashe.keySet()) {
+
+            for (Subtask subtask : subtaskCashe.get(issueID)) {
+
+                // This solution is a bit hacky.
+                // Have a look at IssueID.java to understand why this is necessary.
+                String targetIssueUri = subtask.getIssueUri().toString();
+                long targetIssueId = Long.valueOf(targetIssueUri.substring(targetIssueUri.lastIndexOf('/') + 1));
+                IssueID targetIssueID = IssueID.builder().jiraId(targetIssueId).build();
+                JiraIssue targetIssue = cacheEndpoint.findIssueOrThrowException(targetIssueID);
+
+                JiraIssue sourceIssue = cacheEndpoint.findIssueOrThrowException(issueID);
+                sourceIssue.getSubtasks().add(targetIssue);
             }
         }
     }

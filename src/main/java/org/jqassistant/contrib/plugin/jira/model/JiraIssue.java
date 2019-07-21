@@ -60,4 +60,7 @@ public interface JiraIssue extends Jira, JiraID, JiraAuditInformation, JiraDescr
 
     @Relation("HAS_LINK")
     List<JiraIssueLink> getIssueLinks();
+
+    @Relation("HAS_SUBTASK")
+    List<JiraIssue> getSubtasks();
 }
