@@ -58,13 +58,12 @@ public class DefaultJiraRestClientWrapper implements JiraRestClientWrapper {
     }
 
     @Override
-    public Iterable<Issue> retrieveIssues(String projectKey) {
+    public SearchResult retrieveIssues(String projectKey, int maxResults, int startAt) {
 
         String jplQuery = String.format(JQL_ISSUE_QUERY, projectKey);
-        SearchResult searchResult = jiraRestClient
+        return jiraRestClient
                 .getSearchClient()
-                .searchJql(jplQuery, -1, null, ALL_FIELDS)
+                .searchJql(jplQuery, maxResults, startAt, ALL_FIELDS)
                 .claim();
-        return searchResult.getIssues();
     }
 }

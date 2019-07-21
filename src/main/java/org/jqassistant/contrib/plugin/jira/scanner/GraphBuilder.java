@@ -12,6 +12,8 @@ import org.jqassistant.contrib.plugin.jira.jjrc.DefaultJiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.jjrc.JiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.jjrc.mock.MockedJiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -23,6 +25,8 @@ import static org.jqassistant.contrib.plugin.jira.utils.TimeConverter.convertTim
  * {@link JiraScannerPlugin#scan(FileResource, String, Scope, Scanner)} method.
  */
 public class GraphBuilder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphBuilder.class);
 
     // FIXME: We should find a better solution to switch between the mocked and the default implementation.
     // After fixing this we can also move the mock classes to the test package.
@@ -110,9 +114,11 @@ public class GraphBuilder {
             Component component = jiraRestClientWrapper.retrieveComponent(basicComponent.getSelf());
             JiraComponent jiraComponent = cacheEndpoint.findOrCreateComponent(component);
 
-            User componentLead = jiraRestClientWrapper.retrieveUser(component.getLead().getSelf());
-            JiraUser jiraUser = cacheEndpoint.findOrCreateUser(componentLead);
-            jiraComponent.setLeader(jiraUser);
+            if (component.getLead() != null) {
+                User componentLead = jiraRestClientWrapper.retrieveUser(component.getLead().getSelf());
+                JiraUser jiraUser = cacheEndpoint.findOrCreateUser(componentLead);
+                jiraComponent.setLeader(jiraUser);
+            }
 
             jiraProject.getComponents().add(jiraComponent);
         }
@@ -132,72 +138,88 @@ public class GraphBuilder {
 
     private void resolveIssues(JiraProject jiraProject) {
 
-        for (Issue issue : jiraRestClientWrapper.retrieveIssues(jiraProject.getKey())) {
+        int batchSize = 25;
+        int currentStartIndex = 0;
 
-            JiraIssue jiraIssue = cacheEndpoint.findOrCreateIssue(issue);
+        LOGGER.info(String.format("Loading issues from index %s to %s ...", currentStartIndex, currentStartIndex + batchSize));
+        SearchResult searchResult = jiraRestClientWrapper.retrieveIssues(jiraProject.getKey(), batchSize, currentStartIndex);
 
-            jiraProject.getIssues().add(jiraIssue);
+        while (currentStartIndex < searchResult.getTotal()) {
 
-            if (issue.getAssignee() != null) {
-                JiraUser assignee = cacheEndpoint.findOrCreateUser(issue.getAssignee());
-                jiraIssue.setAssignee(assignee);
-            }
+            for (Issue issue : searchResult.getIssues()) {
 
-            if (issue.getReporter() != null) {
-                JiraUser reporter = cacheEndpoint.findOrCreateUser(issue.getReporter());
-                jiraIssue.setReporter(reporter);
-            }
+                LOGGER.info(String.format("Processing issue with KEY: '%s'", issue.getKey()));
+                JiraIssue jiraIssue = cacheEndpoint.findOrCreateIssue(issue);
 
-            // We already loaded every component for the current project.
-            for (BasicComponent basicComponent : issue.getComponents()) {
-                JiraComponent jiraComponent = cacheEndpoint.findComponentOrThrowException(basicComponent);
-                jiraIssue.getComponents().add(jiraComponent);
-            }
+                jiraProject.getIssues().add(jiraIssue);
 
-            // We already loaded every component for the current project but we can use the default method
-            // as we have not requesting overhead like for components.
-            JiraIssueType jiraIssueType = cacheEndpoint.findOrCreateIssueType(issue.getIssueType());
-            jiraIssue.setIssueType(jiraIssueType);
+                if (issue.getAssignee() != null) {
+                    JiraUser assignee = cacheEndpoint.findOrCreateUser(issue.getAssignee());
+                    jiraIssue.setAssignee(assignee);
+                }
 
-            if (issue.getPriority() != null) {
+                if (issue.getReporter() != null) {
+                    JiraUser reporter = cacheEndpoint.findOrCreateUser(issue.getReporter());
+                    jiraIssue.setReporter(reporter);
+                }
 
-                JiraPriority jiraPriority = cacheEndpoint.findPriorityOrThrowException(issue.getPriority());
-                jiraIssue.setPriority(jiraPriority);
-            }
+                // We already loaded every component for the current project.
+                for (BasicComponent basicComponent : issue.getComponents()) {
+                    JiraComponent jiraComponent = cacheEndpoint.findComponentOrThrowException(basicComponent);
+                    jiraIssue.getComponents().add(jiraComponent);
+                }
 
-            JiraStatus jiraStatus = cacheEndpoint.findOrCreateStatus(issue.getStatus());
-            jiraIssue.setStatus(jiraStatus);
+                // We already loaded every component for the current project but we can use the default method
+                // as we have not requesting overhead like for components.
+                JiraIssueType jiraIssueType = cacheEndpoint.findOrCreateIssueType(issue.getIssueType());
+                jiraIssue.setIssueType(jiraIssueType);
 
-            for (Comment comment : issue.getComments()) {
-                commentLevel(jiraIssue, comment);
-            }
+                if (issue.getPriority() != null) {
 
-            if (issue.getAffectedVersions() != null) {
-                for (Version version : issue.getAffectedVersions()) {
+                    JiraPriority jiraPriority = cacheEndpoint.findPriorityOrThrowException(issue.getPriority());
+                    jiraIssue.setPriority(jiraPriority);
+                }
 
-                    JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
-                    jiraIssue.getAffectedVersions().add(jiraVersion);
+                JiraStatus jiraStatus = cacheEndpoint.findOrCreateStatus(issue.getStatus());
+                jiraIssue.setStatus(jiraStatus);
+
+                for (Comment comment : issue.getComments()) {
+                    commentLevel(jiraIssue, comment);
+                }
+
+                if (issue.getAffectedVersions() != null) {
+                    for (Version version : issue.getAffectedVersions()) {
+
+                        JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
+                        jiraIssue.getAffectedVersions().add(jiraVersion);
+                    }
+                }
+
+                if (issue.getFixVersions() != null) {
+                    for (Version version : issue.getFixVersions()) {
+
+                        JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
+                        jiraIssue.getFixedVersions().add(jiraVersion);
+                    }
+                }
+
+                if (issue.getIssueLinks() != null) {
+                    IssueID issueID = IssueID.builder().jiraId(jiraIssue.getJiraId()).build();
+                    issueLinkCashe.put(issueID, issue.getIssueLinks());
+                }
+
+                if (issue.getSubtasks() != null) {
+                    IssueID issueID = IssueID.builder().jiraId(jiraIssue.getJiraId()).build();
+                    subtaskCashe.put(issueID, issue.getSubtasks());
                 }
             }
 
-            if (issue.getFixVersions() != null) {
-                for (Version version : issue.getFixVersions()) {
-
-                    JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
-                    jiraIssue.getFixedVersions().add(jiraVersion);
-                }
-            }
-
-            if (issue.getIssueLinks() != null) {
-                IssueID issueID = IssueID.builder().jiraId(jiraIssue.getJiraId()).build();
-                issueLinkCashe.put(issueID, issue.getIssueLinks());
-            }
-
-            if (issue.getSubtasks() != null) {
-                IssueID issueID = IssueID.builder().jiraId(jiraIssue.getJiraId()).build();
-                subtaskCashe.put(issueID, issue.getSubtasks());
-            }
+            currentStartIndex += batchSize;
+            LOGGER.info(String.format("Loading issues from index %s to %s ...", currentStartIndex, currentStartIndex + batchSize));
+            searchResult = jiraRestClientWrapper.retrieveIssues(jiraProject.getKey(), batchSize, currentStartIndex);
         }
+
+        LOGGER.info("Finished loading issues.");
     }
 
     private void commentLevel(JiraIssue jiraIssue, Comment comment) {

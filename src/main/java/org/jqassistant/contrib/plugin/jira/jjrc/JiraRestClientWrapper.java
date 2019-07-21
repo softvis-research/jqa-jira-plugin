@@ -25,5 +25,5 @@ public interface JiraRestClientWrapper {
 
     User retrieveUser(URI uri);
 
-    Iterable<Issue> retrieveIssues(String projectKey);
+    SearchResult retrieveIssues(String projectKey, int maxResults, int startAt);
 }

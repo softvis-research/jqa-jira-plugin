@@ -69,8 +69,13 @@ public class MockedJiraRestClientWrapper implements JiraRestClientWrapper {
     }
 
     @Override
-    public Iterable<Issue> retrieveIssues(String projectKey) {
-        return Collections.singletonList(
+    public SearchResult retrieveIssues(String projectKey, int maxResults, int startAt) {
+
+        if (startAt > 0) {
+            return new SearchResult(0, 0, 0, Collections.emptyList());
+        }
+
+        Iterable<Issue> issues = Collections.singletonList(
                 mockedIssue.retrieveIssue(
                         mockedProject.retrieveBasicProject(),
                         mockedIssueType.retrieveIssueType(),
@@ -80,7 +85,8 @@ public class MockedJiraRestClientWrapper implements JiraRestClientWrapper {
                         mockedVersion.retrieveVersion(),
                         mockedComponent.retrieveBasicComponent(),
                         mockedComment.retrieveComment(mockedUser.retrieveBasicUser()),
-                        mockedIssueLink.retrieveIssueLink())
-        );
+                        mockedIssueLink.retrieveIssueLink()));
+
+        return new SearchResult(1, 0, 1, issues);
     }
 }
