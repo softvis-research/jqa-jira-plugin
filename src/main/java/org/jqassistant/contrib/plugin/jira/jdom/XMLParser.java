@@ -37,7 +37,7 @@ public class XMLParser {
      * @throws JDOMException If XML parsing failed.
      * @throws IOException   If reading the config file failed.
      */
-    public XMLJiraPluginConfiguration parseConfiguration(InputStream inputStream) throws JDOMException, IOException {
+    public XMLJiraPluginConfiguration parseConfiguration(InputStream inputStream) throws JDOMException, NullPointerException, IOException {
 
         SAXBuilder builder = new SAXBuilder();
         Document document = builder.build(inputStream);

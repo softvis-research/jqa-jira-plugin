@@ -17,9 +17,9 @@ import java.util.HashMap;
 
 import static org.jqassistant.contrib.plugin.jira.utils.TimeConverter.convertTime;
 
-class GraphBuilder {
+public class GraphBuilder {
 
-    static String TEST_ENV = "JQASSISTANT_JIRA_PLUGIN_TEST";
+    public static String TEST_ENV = "JQASSISTANT_JIRA_PLUGIN_TEST";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphBuilder.class);
 

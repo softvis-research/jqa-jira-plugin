@@ -85,6 +85,10 @@ public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraS
 
         XMLJiraPluginConfiguration xmlJiraPluginConfiguration = this.readConfigurationFile(item);
 
+        if (xmlJiraPluginConfiguration == null) {
+            return null;
+        }
+
         final JiraServer jiraServer = this.createRootDescriptor(scanner);
 
         CacheEndpoint cacheEndpoint = new CacheEndpoint(getScannerContext().getStore());
@@ -99,7 +103,7 @@ public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraS
 
         try {
             return xmlParser.parseConfiguration(fileResource.createStream());
-        } catch (JDOMException e) {
+        } catch (JDOMException | NullPointerException e) {
             LOGGER.error(fileResource.getFile().getAbsolutePath() + " could not be parsed. Error:", e);
             return null;
         }
