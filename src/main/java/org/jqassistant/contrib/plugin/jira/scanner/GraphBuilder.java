@@ -1,6 +1,9 @@
 package org.jqassistant.contrib.plugin.jira.scanner;
 
 import com.atlassian.jira.rest.client.api.domain.*;
+import com.buschmais.jqassistant.core.scanner.api.Scanner;
+import com.buschmais.jqassistant.core.scanner.api.Scope;
+import com.buschmais.jqassistant.plugin.common.api.scanner.filesystem.FileResource;
 import org.jqassistant.contrib.plugin.jira.cache.CacheEndpoint;
 import org.jqassistant.contrib.plugin.jira.ids.IssueID;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraPluginConfiguration;
@@ -9,19 +12,20 @@ import org.jqassistant.contrib.plugin.jira.jjrc.DefaultJiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.jjrc.JiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.jjrc.mock.MockedJiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.HashMap;
 
 import static org.jqassistant.contrib.plugin.jira.utils.TimeConverter.convertTime;
 
+/**
+ * The GraphBuilder gets build only once per execution of the Jira plugin
+ * {@link JiraScannerPlugin#scan(FileResource, String, Scope, Scanner)} method.
+ */
 public class GraphBuilder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GraphBuilder.class);
-
-    // FIXME
+    // FIXME: We should find a better solution to switch between the mocked and the default implementation.
+    // After fixing this we can also move the mock classes to the test package.
     public static String TEST_ENV = "JQASSISTANT_JIRA_PLUGIN_TEST";
 
     private final JiraRestClientWrapper jiraRestClientWrapper;
@@ -113,7 +117,7 @@ public class GraphBuilder {
 
     /**
      * The {@link BasicUser} which is part of the {@link Project} is not enough as it misses some fields like "name".
-     * Therefore, we load the user separately.
+     * Therefore, we have to load the complete {@link User} separately.
      */
     private void resolveLeaderForProject(JiraProject jiraProject, URI projectLeadSelf) {
 

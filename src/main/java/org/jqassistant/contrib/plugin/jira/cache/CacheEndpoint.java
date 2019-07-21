@@ -15,6 +15,16 @@ import java.time.ZonedDateTime;
 
 import static org.jqassistant.contrib.plugin.jira.utils.TimeConverter.convertTime;
 
+/**
+ * This class was written to handle nodes in the resulting graph that get referenced more than one
+ * time. These nodes get cached in the {@link DescriptorCache}.
+ * </p>
+ * All of the methods in this class work similar:
+ * </p>
+ * They check if a certain descriptor instance exists. If it does
+ * exist, they return the instance. Otherwise they create a new one and save it in the
+ * {@link Store} and in the {@link DescriptorCache}.
+ */
 public class CacheEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheEndpoint.class);

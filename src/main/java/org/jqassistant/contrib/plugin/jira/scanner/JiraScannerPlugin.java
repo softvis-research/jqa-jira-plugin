@@ -75,7 +75,7 @@ public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraS
      * @param scope   The current jQAssistant scope.
      * @param scanner The jQAssistant scanner which will be used to extract the main descriptor and the jQAssistant
      *                store.
-     * @return The main descriptor which can specify multiple repositories.
+     * @return The main descriptor which represents a Jira instance.
      * @throws IOException If the application can't open a file stream for the configuration file.
      */
     @Override

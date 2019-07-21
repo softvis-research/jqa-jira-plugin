@@ -1,5 +1,6 @@
 package org.jqassistant.contrib.plugin.jira.utils;
 
+import com.atlassian.jira.rest.client.api.JiraRestClient;
 import org.joda.time.DateTime;
 
 import java.time.LocalDateTime;
@@ -7,6 +8,11 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
+/**
+ * {@link JiraRestClient} uses joda-time while <b>jQAssistant</b> uses the Java 8 time.
+ *
+ * This helper class has been written to convert them.
+ */
 public abstract class TimeConverter {
 
     /**

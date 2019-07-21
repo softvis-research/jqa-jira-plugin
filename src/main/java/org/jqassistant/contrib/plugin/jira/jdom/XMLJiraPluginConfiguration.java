@@ -10,8 +10,6 @@ import java.util.List;
 public class XMLJiraPluginConfiguration {
 
     private String url;
-
     private XMLCredentials credentials;
-
     private List<XMLJiraProject> projects;
 }

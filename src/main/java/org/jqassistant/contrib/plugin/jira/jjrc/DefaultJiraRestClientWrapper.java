@@ -8,6 +8,12 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
 
+/**
+ * The default implementation for the {@link JiraRestClientWrapper} uses the {@link JiraRestClient} to
+ * retrieve data from a Jira instance.
+ *
+ * All data is loaded synchronously.
+ */
 public class DefaultJiraRestClientWrapper implements JiraRestClientWrapper {
 
     private static final String JQL_ISSUE_QUERY = "project=%s";
