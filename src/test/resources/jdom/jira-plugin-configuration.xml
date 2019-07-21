@@ -10,6 +10,9 @@
         <project>
             <key>Project X</key>
         </project>
+        <project>
+            <key>Project Y</key>
+        </project>
     </projects>
 
 </jira-configuration>

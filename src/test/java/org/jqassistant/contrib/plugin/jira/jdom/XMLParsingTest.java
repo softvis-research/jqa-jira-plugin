@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class XMLParsingTest {
 
-    private static final String TEST_CONFIGURATION_FILE_NAME = "jira-plugin-configuration.xml";
+    private static final String TEST_CONFIGURATION_FILE_NAME = "jdom/jira-plugin-configuration.xml";
 
     @Test
     public void when_pluginConfigurationFileWasParsed_resultIsCorrect() throws JDOMException, IOException {

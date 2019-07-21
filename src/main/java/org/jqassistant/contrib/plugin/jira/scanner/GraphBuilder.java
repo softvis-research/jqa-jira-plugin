@@ -1,30 +1,29 @@
 package org.jqassistant.contrib.plugin.jira.scanner;
 
-import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.api.domain.*;
-import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import org.jqassistant.contrib.plugin.jira.cache.CacheEndpoint;
 import org.jqassistant.contrib.plugin.jira.ids.IssueID;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraPluginConfiguration;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraProject;
+import org.jqassistant.contrib.plugin.jira.jjrc.DefaultJiraRestClientWrapper;
+import org.jqassistant.contrib.plugin.jira.jjrc.JiraRestClientWrapper;
+import org.jqassistant.contrib.plugin.jira.jjrc.MockedJiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Set;
+
+import static org.jqassistant.contrib.plugin.jira.utils.TimeConverter.convertTime;
 
 class GraphBuilder {
 
-    private static final String JQL_ISSUE_QUERY = "project=%s";
-
-    private static final Set<String> ALL_FIELDS = Collections.singleton("*all");
+    static String TEST_ENV = "JQASSISTANT_JIRA_PLUGIN_TEST";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphBuilder.class);
 
-    private final JiraRestClient jiraRestClient;
+    private final JiraRestClientWrapper jiraRestClientWrapper;
     private final CacheEndpoint cacheEndpoint;
 
     private final HashMap<IssueID, Iterable<IssueLink>> issueLinkCashe;
@@ -38,29 +37,32 @@ class GraphBuilder {
         String username = xmlJiraPluginConfiguration.getCredentials().getUser();
         String password = xmlJiraPluginConfiguration.getCredentials().getPassword();
 
-        jiraRestClient = new AsynchronousJiraRestClientFactory()
-                .createWithBasicHttpAuthentication(URI.create(url), username, password);
+        if (System.getenv(TEST_ENV) != null) {
+            jiraRestClientWrapper = new MockedJiraRestClientWrapper();
+        } else {
+            jiraRestClientWrapper = new DefaultJiraRestClientWrapper(url, username, password);
+        }
     }
 
     void startTraversal(final JiraServer jiraServer,
                         final XMLJiraPluginConfiguration xmlJiraPluginConfiguration) {
 
-        ServerInfo serverInfo = jiraRestClient.getMetadataClient().getServerInfo().claim();
+        ServerInfo serverInfo = jiraRestClientWrapper.retrieveServerInfo();
         jiraServer.setBaseUri(serverInfo.getBaseUri().toString());
         jiraServer.setVersion(serverInfo.getVersion());
         jiraServer.setBuildNumber(serverInfo.getBuildNumber());
-        jiraServer.setBuildDate(CacheEndpoint.convertTime(serverInfo.getBuildDate()));
-        jiraServer.setServerTime(CacheEndpoint.convertTime(serverInfo.getServerTime()));
+        jiraServer.setBuildDate(convertTime(serverInfo.getBuildDate()));
+        jiraServer.setServerTime(convertTime(serverInfo.getServerTime()));
         jiraServer.setScmInfo(serverInfo.getScmInfo());
         jiraServer.setServerTitle(serverInfo.getServerTitle());
 
-        for (Priority priority : jiraRestClient.getMetadataClient().getPriorities().claim()) {
+        for (Priority priority : jiraRestClientWrapper.retrievePriorities()) {
 
             JiraPriority jiraPriority = cacheEndpoint.findOrCreatePriority(priority);
             jiraServer.getPriorities().add(jiraPriority);
         }
 
-        for (Status status : jiraRestClient.getMetadataClient().getStatuses().claim()) {
+        for (Status status : jiraRestClientWrapper.retrieveStatuses()) {
 
             JiraStatus jiraStatus = cacheEndpoint.findOrCreateStatus(status);
             jiraServer.getStatuses().add(jiraStatus);
@@ -68,7 +70,7 @@ class GraphBuilder {
 
         for (XMLJiraProject xmlJiraProject : xmlJiraPluginConfiguration.getProjects()) {
 
-            Project project = jiraRestClient.getProjectClient().getProject(xmlJiraProject.getKey()).claim();
+            Project project = jiraRestClientWrapper.retrieveProject(xmlJiraProject.getKey());
             JiraProject jiraProject = cacheEndpoint.findOrCreateProject(project);
 
             jiraServer.getProjects().add(jiraProject);
@@ -97,10 +99,10 @@ class GraphBuilder {
 
         for (BasicComponent basicComponent : basicComponentList) {
 
-            Component component = jiraRestClient.getComponentClient().getComponent(basicComponent.getSelf()).claim();
+            Component component = jiraRestClientWrapper.retrieveComponent(basicComponent.getSelf());
             JiraComponent jiraComponent = cacheEndpoint.findOrCreateComponent(component);
 
-            User componentLead = jiraRestClient.getUserClient().getUser(component.getLead().getSelf()).claim();
+            User componentLead = jiraRestClientWrapper.retrieveUser(component.getLead().getSelf());
             JiraUser jiraUser = cacheEndpoint.findOrCreateUser(componentLead);
             jiraComponent.setLeader(jiraUser);
 
@@ -114,17 +116,15 @@ class GraphBuilder {
      */
     private void resolveLeaderForProject(JiraProject jiraProject, URI projectLeadSelf) {
 
-        User projectLeadUser = jiraRestClient.getUserClient().getUser(projectLeadSelf).claim();
+        User projectLeadUser = jiraRestClientWrapper.retrieveUser(projectLeadSelf);
 
         JiraUser jiraUser = cacheEndpoint.findOrCreateUser(projectLeadUser);
-        jiraProject.setLeader(jiraUser);
+        jiraProject.setLead(jiraUser);
     }
 
     private void resolveIssues(JiraProject jiraProject) {
 
-        SearchResult searchResultIssuesForThisProject = jiraRestClient.getSearchClient().searchJql(String.format(JQL_ISSUE_QUERY, jiraProject.getKey()), -1, null, ALL_FIELDS).claim();
-
-        for (Issue issue : searchResultIssuesForThisProject.getIssues()) {
+        for (Issue issue : jiraRestClientWrapper.retrieveIssues(jiraProject.getKey())) {
 
             JiraIssue jiraIssue = cacheEndpoint.findOrCreateIssue(issue);
 
@@ -193,14 +193,14 @@ class GraphBuilder {
 
         if (comment.getAuthor() != null) {
 
-            User commentAuthor = jiraRestClient.getUserClient().getUser(comment.getAuthor().getSelf()).claim();
+            User commentAuthor = jiraRestClientWrapper.retrieveUser(comment.getAuthor().getSelf());
             JiraUser jiraUser = cacheEndpoint.findOrCreateUser(commentAuthor);
             jiraComment.setAuthor(jiraUser);
         }
 
         if (comment.getUpdateAuthor() != null) {
 
-            User commentUpdateAuthor = jiraRestClient.getUserClient().getUser(comment.getUpdateAuthor().getSelf()).claim();
+            User commentUpdateAuthor = jiraRestClientWrapper.retrieveUser(comment.getUpdateAuthor().getSelf());
             JiraUser jiraUser = cacheEndpoint.findOrCreateUser(commentUpdateAuthor);
             jiraComment.setUpdateAuthor(jiraUser);
         }
