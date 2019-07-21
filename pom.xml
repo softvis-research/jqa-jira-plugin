@@ -110,6 +110,14 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.4</version>
+                <configuration>
+                    <excludes>
+<!--                        We remove the JJRC wrapper from the scan as it gets mocked in the tests-->
+                        <exclude>**/DefaultJiraRestClientWrapper.*</exclude>
+                        <exclude>**/Mocked*</exclude>
+                        <exclude>**/ids/*ID*</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

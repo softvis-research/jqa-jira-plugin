@@ -7,7 +7,7 @@ import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraPluginConfiguration;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraProject;
 import org.jqassistant.contrib.plugin.jira.jjrc.DefaultJiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.jjrc.JiraRestClientWrapper;
-import org.jqassistant.contrib.plugin.jira.jjrc.MockedJiraRestClientWrapper;
+import org.jqassistant.contrib.plugin.jira.jjrc.mock.MockedJiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +19,10 @@ import static org.jqassistant.contrib.plugin.jira.utils.TimeConverter.convertTim
 
 public class GraphBuilder {
 
-    public static String TEST_ENV = "JQASSISTANT_JIRA_PLUGIN_TEST";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphBuilder.class);
+
+    // FIXME
+    public static String TEST_ENV = "JQASSISTANT_JIRA_PLUGIN_TEST";
 
     private final JiraRestClientWrapper jiraRestClientWrapper;
     private final CacheEndpoint cacheEndpoint;

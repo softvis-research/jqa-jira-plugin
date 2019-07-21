@@ -40,12 +40,12 @@ public interface JiraServer extends Jira, FileDescriptor {
     String getServerTitle();
     void setServerTitle(String serverTitle);
 
-    @Relation("SPECIFIES")
+    @Relation("SPECIFIES_PROJECT")
     List<JiraProject> getProjects();
 
-    @Relation("SPECIFIES")
+    @Relation("SPECIFIES_PRIORITY")
     List<JiraPriority> getPriorities();
 
-    @Relation("SPECIFIES")
+    @Relation("SPECIFIES_STATUS")
     List<JiraStatus> getStatuses();
 }

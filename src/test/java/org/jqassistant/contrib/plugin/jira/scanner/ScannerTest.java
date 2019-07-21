@@ -4,7 +4,8 @@ import com.buschmais.jqassistant.core.scanner.api.DefaultScope;
 import com.buschmais.jqassistant.core.store.api.model.Descriptor;
 import com.buschmais.jqassistant.plugin.common.test.AbstractPluginIT;
 import org.hamcrest.CoreMatchers;
-import org.jqassistant.contrib.plugin.jira.jjrc.MockedJiraRestClientWrapper;
+import org.jqassistant.contrib.plugin.jira.jjrc.mock.MockedProject;
+import org.jqassistant.contrib.plugin.jira.jjrc.mock.MockedServerInfo;
 import org.jqassistant.contrib.plugin.jira.model.JiraServer;
 import org.jqassistant.contrib.plugin.jira.utils.EnvironmentOverrider;
 import org.junit.BeforeClass;
@@ -36,25 +37,25 @@ public class ScannerTest extends AbstractPluginIT {
         assertThat(descriptor, CoreMatchers.instanceOf(JiraServer.class));
 
         JiraServer jiraServer = (JiraServer) descriptor;
-        assertEquals(MockedJiraRestClientWrapper.SERVER_BASE_URI.toString(), jiraServer.getBaseUri());
-        assertEquals(MockedJiraRestClientWrapper.SERVER_VERSION, jiraServer.getVersion());
-        assertEquals(MockedJiraRestClientWrapper.SERVER_BUILD_NUMBER, jiraServer.getBuildNumber());
-        assertEquals(convertTime(MockedJiraRestClientWrapper.SERVER_BUILD_DATE), jiraServer.getBuildDate());
-        assertEquals(convertTime(MockedJiraRestClientWrapper.SERVER_SERVER_TIME), jiraServer.getServerTime());
-        assertEquals(MockedJiraRestClientWrapper.SERVER_SCM_INFO, jiraServer.getScmInfo());
-        assertEquals(MockedJiraRestClientWrapper.SERVER_SERVER_TITLE, jiraServer.getServerTitle());
+        assertEquals(MockedServerInfo.BASE_URI.toString(), jiraServer.getBaseUri());
+        assertEquals(MockedServerInfo.VERSION, jiraServer.getVersion());
+        assertEquals(MockedServerInfo.BUILD_NUMBER, jiraServer.getBuildNumber());
+        assertEquals(convertTime(MockedServerInfo.BUILD_DATE), jiraServer.getBuildDate());
+        assertEquals(convertTime(MockedServerInfo.SERVER_TIME), jiraServer.getServerTime());
+        assertEquals(MockedServerInfo.SCM_INFO, jiraServer.getScmInfo());
+        assertEquals(MockedServerInfo.SERVER_TITLE, jiraServer.getServerTitle());
 
         assertEquals(1, jiraServer.getProjects().size());
         assertNotNull(jiraServer.getProjects().get(0).getLead());
 
         TestResult testResult = query(
                 "MATCH\n" +
-                        "    (js:`Jira-Server`)-[:SPECIFIES]->(p:`Jira-Project`)\n" +
+                        "    (js:`Jira-Server`)-[:SPECIFIES_PROJECT]->(p:`Jira-Project`)\n" +
                         "RETURN\n" +
                         "    p.key, js.serverTitle");
 
         assertEquals(1, testResult.getColumn("p.key").size());
-        assertEquals("Project X", testResult.getColumn("p.key").get(0));
+        assertEquals(MockedProject.KEY, testResult.getColumn("p.key").get(0));
 
         store.commitTransaction();
     }
