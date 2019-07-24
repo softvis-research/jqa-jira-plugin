@@ -5,6 +5,7 @@ import com.buschmais.jqassistant.core.scanner.api.Scanner;
 import com.buschmais.jqassistant.core.scanner.api.Scope;
 import com.buschmais.jqassistant.plugin.common.api.scanner.filesystem.FileResource;
 import org.jqassistant.contrib.plugin.jira.cache.CacheEndpoint;
+import org.jqassistant.contrib.plugin.jira.cache.EntityNotFoundException;
 import org.jqassistant.contrib.plugin.jira.ids.IssueID;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraPluginConfiguration;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraProject;
@@ -44,22 +45,25 @@ public class GraphBuilder {
         this.subtaskCashe = new HashMap<>();
         this.cacheEndpoint = cacheEndpoint;
 
-        String url = xmlJiraPluginConfiguration.getUrl();
-        String username = xmlJiraPluginConfiguration.getCredentials().getUser();
-        String password = xmlJiraPluginConfiguration.getCredentials().getPassword();
+        String url      = xmlJiraPluginConfiguration.getUrl();
+        String username = xmlJiraPluginConfiguration.getCredentials()
+                                                    .getUser();
+        String password = xmlJiraPluginConfiguration.getCredentials()
+                                                    .getPassword();
 
         if (System.getenv(TEST_ENV) != null) {
             jiraRestClientWrapper = new MockedJiraRestClientWrapper();
-        } else {
+        }
+        else {
             jiraRestClientWrapper = new DefaultJiraRestClientWrapper(url, username, password);
         }
     }
 
-    void startTraversal(final JiraServer jiraServer,
-                        final XMLJiraPluginConfiguration xmlJiraPluginConfiguration) {
+    void startTraversal(final JiraServer jiraServer, final XMLJiraPluginConfiguration xmlJiraPluginConfiguration) {
 
         ServerInfo serverInfo = jiraRestClientWrapper.retrieveServerInfo();
-        jiraServer.setBaseUri(serverInfo.getBaseUri().toString());
+        jiraServer.setBaseUri(serverInfo.getBaseUri()
+                                        .toString());
         jiraServer.setVersion(serverInfo.getVersion());
         jiraServer.setBuildNumber(serverInfo.getBuildNumber());
         jiraServer.setBuildDate(convertTime(serverInfo.getBuildDate()));
@@ -70,36 +74,42 @@ public class GraphBuilder {
         for (Priority priority : jiraRestClientWrapper.retrievePriorities()) {
 
             JiraPriority jiraPriority = cacheEndpoint.findOrCreatePriority(priority);
-            jiraServer.getPriorities().add(jiraPriority);
+            jiraServer.getPriorities()
+                      .add(jiraPriority);
         }
 
         for (Status status : jiraRestClientWrapper.retrieveStatuses()) {
 
             JiraStatus jiraStatus = cacheEndpoint.findOrCreateStatus(status);
-            jiraServer.getStatuses().add(jiraStatus);
+            jiraServer.getStatuses()
+                      .add(jiraStatus);
         }
 
         for (XMLJiraProject xmlJiraProject : xmlJiraPluginConfiguration.getProjects()) {
 
-            Project project = jiraRestClientWrapper.retrieveProject(xmlJiraProject.getKey());
+            Project     project     = jiraRestClientWrapper.retrieveProject(xmlJiraProject.getKey());
             JiraProject jiraProject = cacheEndpoint.findOrCreateProject(project);
 
-            jiraServer.getProjects().add(jiraProject);
+            jiraServer.getProjects()
+                      .add(jiraProject);
 
             for (Version version : project.getVersions()) {
 
                 JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
-                jiraProject.getVersions().add(jiraVersion);
+                jiraProject.getVersions()
+                           .add(jiraVersion);
             }
 
             for (IssueType issueType : project.getIssueTypes()) {
 
                 JiraIssueType jiraIssueType = cacheEndpoint.findOrCreateIssueType(issueType);
-                jiraProject.getIssueTypes().add(jiraIssueType);
+                jiraProject.getIssueTypes()
+                           .add(jiraIssueType);
             }
 
             resolveComponentsForProject(jiraProject, project.getComponents());
-            resolveLeaderForProject(jiraProject, project.getLead().getSelf());
+            resolveLeaderForProject(jiraProject, project.getLead()
+                                                        .getSelf());
             resolveIssues(jiraProject);
         }
 
@@ -111,16 +121,18 @@ public class GraphBuilder {
 
         for (BasicComponent basicComponent : basicComponentList) {
 
-            Component component = jiraRestClientWrapper.retrieveComponent(basicComponent.getSelf());
+            Component     component     = jiraRestClientWrapper.retrieveComponent(basicComponent.getSelf());
             JiraComponent jiraComponent = cacheEndpoint.findOrCreateComponent(component);
 
             if (component.getLead() != null) {
-                User componentLead = jiraRestClientWrapper.retrieveUser(component.getLead().getSelf());
-                JiraUser jiraUser = cacheEndpoint.findOrCreateUser(componentLead);
+                User     componentLead = jiraRestClientWrapper.retrieveUser(component.getLead()
+                                                                                     .getSelf());
+                JiraUser jiraUser      = cacheEndpoint.findOrCreateUser(componentLead);
                 jiraComponent.setLeader(jiraUser);
             }
 
-            jiraProject.getComponents().add(jiraComponent);
+            jiraProject.getComponents()
+                       .add(jiraComponent);
         }
     }
 
@@ -138,7 +150,7 @@ public class GraphBuilder {
 
     private void resolveIssues(JiraProject jiraProject) {
 
-        int batchSize = 25;
+        int batchSize         = 25;
         int currentStartIndex = 0;
 
         LOGGER.info(String.format("Loading issues from index %s to %s ...", currentStartIndex, currentStartIndex + batchSize));
@@ -151,7 +163,8 @@ public class GraphBuilder {
                 LOGGER.info(String.format("Processing issue with KEY: '%s'", issue.getKey()));
                 JiraIssue jiraIssue = cacheEndpoint.findOrCreateIssue(issue);
 
-                jiraProject.getIssues().add(jiraIssue);
+                jiraProject.getIssues()
+                           .add(jiraIssue);
 
                 if (issue.getAssignee() != null) {
                     JiraUser assignee = cacheEndpoint.findOrCreateUser(issue.getAssignee());
@@ -166,7 +179,8 @@ public class GraphBuilder {
                 // We already loaded every component for the current project.
                 for (BasicComponent basicComponent : issue.getComponents()) {
                     JiraComponent jiraComponent = cacheEndpoint.findComponentOrThrowException(basicComponent);
-                    jiraIssue.getComponents().add(jiraComponent);
+                    jiraIssue.getComponents()
+                             .add(jiraComponent);
                 }
 
                 // We already loaded every component for the current project but we can use the default method
@@ -191,7 +205,8 @@ public class GraphBuilder {
                     for (Version version : issue.getAffectedVersions()) {
 
                         JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
-                        jiraIssue.getAffectedVersions().add(jiraVersion);
+                        jiraIssue.getAffectedVersions()
+                                 .add(jiraVersion);
                     }
                 }
 
@@ -199,17 +214,22 @@ public class GraphBuilder {
                     for (Version version : issue.getFixVersions()) {
 
                         JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
-                        jiraIssue.getFixedVersions().add(jiraVersion);
+                        jiraIssue.getFixedVersions()
+                                 .add(jiraVersion);
                     }
                 }
 
                 if (issue.getIssueLinks() != null) {
-                    IssueID issueID = IssueID.builder().jiraId(jiraIssue.getJiraId()).build();
+                    IssueID issueID = IssueID.builder()
+                                             .jiraId(jiraIssue.getJiraId())
+                                             .build();
                     issueLinkCashe.put(issueID, issue.getIssueLinks());
                 }
 
                 if (issue.getSubtasks() != null) {
-                    IssueID issueID = IssueID.builder().jiraId(jiraIssue.getJiraId()).build();
+                    IssueID issueID = IssueID.builder()
+                                             .jiraId(jiraIssue.getJiraId())
+                                             .build();
                     subtaskCashe.put(issueID, issue.getSubtasks());
                 }
             }
@@ -228,19 +248,22 @@ public class GraphBuilder {
 
         if (comment.getAuthor() != null) {
 
-            User commentAuthor = jiraRestClientWrapper.retrieveUser(comment.getAuthor().getSelf());
-            JiraUser jiraUser = cacheEndpoint.findOrCreateUser(commentAuthor);
+            User     commentAuthor = jiraRestClientWrapper.retrieveUser(comment.getAuthor()
+                                                                               .getSelf());
+            JiraUser jiraUser      = cacheEndpoint.findOrCreateUser(commentAuthor);
             jiraComment.setAuthor(jiraUser);
         }
 
         if (comment.getUpdateAuthor() != null) {
 
-            User commentUpdateAuthor = jiraRestClientWrapper.retrieveUser(comment.getUpdateAuthor().getSelf());
-            JiraUser jiraUser = cacheEndpoint.findOrCreateUser(commentUpdateAuthor);
+            User     commentUpdateAuthor = jiraRestClientWrapper.retrieveUser(comment.getUpdateAuthor()
+                                                                                     .getSelf());
+            JiraUser jiraUser            = cacheEndpoint.findOrCreateUser(commentUpdateAuthor);
             jiraComment.setUpdateAuthor(jiraUser);
         }
 
-        jiraIssue.getComments().add(jiraComment);
+        jiraIssue.getComments()
+                 .add(jiraComment);
     }
 
     private void resolveIssueLinks() {
@@ -249,17 +272,35 @@ public class GraphBuilder {
 
             for (IssueLink issueLink : issueLinkCashe.get(issueID)) {
 
-                JiraIssueLink jiraIssueLink = cacheEndpoint.createIssueLink(issueLink);
+                try {
+                    // Always create the IssueLink, even if the target can not be resolved.
+                    JiraIssueLink jiraIssueLink = cacheEndpoint.createIssueLink(issueLink);
+                    cacheEndpoint.findIssueOrThrowException(issueID)
+                                 .getIssueLinks()
+                                 .add(jiraIssueLink);
 
-                // This solution is a bit hacky.
-                // Have a look at IssueID.java to understand why this is necessary.
-                String targetIssueUri = issueLink.getTargetIssueUri().toString();
-                long targetIssueId = Long.valueOf(targetIssueUri.substring(targetIssueUri.lastIndexOf('/') + 1));
+                    // This solution is a bit hacky.
+                    // Have a look at IssueID.java to understand why this is necessary.
+                    String targetIssueUri = issueLink.getTargetIssueUri()
+                                                     .toString();
+                    long   targetIssueId  = Long.valueOf(targetIssueUri.substring(targetIssueUri.lastIndexOf('/') + 1));
 
-                IssueID targetIssueID = IssueID.builder().jiraId(targetIssueId).build();
-                jiraIssueLink.setTargetIssue(cacheEndpoint.findIssueOrThrowException(targetIssueID));
+                    // This can throw an exception as the target issue does not need to be part of the project.
+                    IssueID   targetIssueID = IssueID.builder()
+                                                     .jiraId(targetIssueId)
+                                                     .build();
+                    JiraIssue targetIssue   = cacheEndpoint.findIssueOrThrowException(targetIssueID);
 
-                cacheEndpoint.findIssueOrThrowException(issueID).getIssueLinks().add(jiraIssueLink);
+                    jiraIssueLink.setTargetIssue(targetIssue);
+
+                }
+                catch (EntityNotFoundException e) {
+
+                    LOGGER.warn(String.format("Creating a link between issues failed with message: '%s'. Here is the 'IssueLink' object: " +
+                                              "'%s'. This can happen as issue links can point at issues which have not been loaded, e.g. " +
+                                              "if they are in other projects.",
+                                              issueLink.toString(), e.getMessage()));
+                }
             }
         }
     }
@@ -272,13 +313,17 @@ public class GraphBuilder {
 
                 // This solution is a bit hacky.
                 // Have a look at IssueID.java to understand why this is necessary.
-                String targetIssueUri = subtask.getIssueUri().toString();
-                long targetIssueId = Long.valueOf(targetIssueUri.substring(targetIssueUri.lastIndexOf('/') + 1));
-                IssueID targetIssueID = IssueID.builder().jiraId(targetIssueId).build();
-                JiraIssue targetIssue = cacheEndpoint.findIssueOrThrowException(targetIssueID);
+                String    targetIssueUri = subtask.getIssueUri()
+                                                  .toString();
+                long      targetIssueId  = Long.valueOf(targetIssueUri.substring(targetIssueUri.lastIndexOf('/') + 1));
+                IssueID   targetIssueID  = IssueID.builder()
+                                                  .jiraId(targetIssueId)
+                                                  .build();
+                JiraIssue targetIssue    = cacheEndpoint.findIssueOrThrowException(targetIssueID);
 
                 JiraIssue sourceIssue = cacheEndpoint.findIssueOrThrowException(issueID);
-                sourceIssue.getSubtasks().add(targetIssue);
+                sourceIssue.getSubtasks()
+                           .add(targetIssue);
             }
         }
     }

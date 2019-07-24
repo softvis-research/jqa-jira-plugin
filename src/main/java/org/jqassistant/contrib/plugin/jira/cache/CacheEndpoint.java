@@ -313,7 +313,7 @@ public class CacheEndpoint {
         JiraIssue jiraIssue = descriptorCache.get(issueId);
 
         if (jiraIssue == null) {
-            throw new IllegalArgumentException("We can't find a JiraIssue with ID: " + issueId);
+            throw new EntityNotFoundException("We can't find a JiraIssue with ID: " + issueId);
         }
 
         return jiraIssue;
