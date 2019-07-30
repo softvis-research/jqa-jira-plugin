@@ -54,6 +54,19 @@ jqassistant-commandline-neo4jv3-1.6.0/bin/jqassistant.sh server
 
 ![Neo4J model for the jQAssistant Jira plugin](./model.jpg)
 
+## Supported Jira Versions
+
+Unfortunately, we did not find any documentation which Jira versions are supported by the [JIRA REST Java Client](https://mvnrepository.com/artifact/com.atlassian.jira/jira-rest-java-client-api/5.1.1-e0dd194).
+According to the [BitBucket repository description](https://bitbucket.org/atlassian/jira-rest-java-client/src/master/) 
+every version newer than JIRA 4.2  is supported:
+
+> Java client library (useful for any JVM languages) which allows to communicate with JIRA via its new REST API (JIRA 4.2 and newer).
+
+The README.md references a [Wiki entry](https://ecosystem.atlassian.net/wiki/spaces/JRJC/overview) from 2010. 
+This again references an [ATLASSIAN Marketplace page](https://marketplace.atlassian.com/apps/39474/rest-java-client-for-jira/version-history) which is out of date since 2013.
+
+If it does not work with your Jira instance please open an **Issue** and write your Jira version in there.
+
 ## Performance
 
 A real benchmark does not make sense as the performance of the plugin depends on the performance of the Jira instance. Nevertheless, we 
@@ -70,6 +83,10 @@ The first Jira instance we scanned had the following entity counts:
 | Issue Link  | ~1400 |
 
 The scan took a total of 11 minutes.
+
+## Rate Limits
+
+When running against a Jira cloud instance there could be an issue with rate limits. For more information please see the [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Contribute
 
