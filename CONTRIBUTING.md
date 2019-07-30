@@ -1,5 +1,37 @@
 # Contribute
 
+## Bash Script for Development 
+
+To test the plugin we need to build the fat `.jar`, put it into the **jQAssistant** command line distribution and execute it 
+with a certain plugin configuration. Please consider using the following script:
+
+```bash
+#!/usr/bin/env bash
+
+# Remove the current build
+echo 'Removing ./target ...'
+rm -r target
+
+# Build the plugin
+mvn clean package
+
+# Remove the existing database
+echo 'Removing ./jqassistant ...'
+rm -r jqassistant
+
+echo 'Copying plugin jar into jQAssistant CLI ...'
+cp target/jqa-jira-plugin-*.jar run/jqassistant-commandline-neo4jv3-1.6.0/plugins/
+
+# Scan the test project
+run/jqassistant-commandline-neo4jv3-1.6.0/bin/jqassistant.sh scan -f run/jira-plugin-configuration.xml
+
+# Start a Neo4J server
+run/jqassistant-commandline-neo4jv3-1.6.0/bin/jqassistant.sh server
+```
+
+To use it create a `run` folder, put the command line distribution in it and paste a test configuration in 
+`run/jira-plugin-configuration.xml`. For a valid plugin configuration have a look at the [README.md](README.md).
+
 ## Local Jira Server
 
 As of today, 2nd of June 2019, there is no official docker image available via 
