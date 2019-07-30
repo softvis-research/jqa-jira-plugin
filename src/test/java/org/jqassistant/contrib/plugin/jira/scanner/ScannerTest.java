@@ -50,7 +50,7 @@ public class ScannerTest extends AbstractPluginIT {
 
         TestResult testResult = query(
                 "MATCH\n" +
-                        "    (js:`Jira-Server`)-[:SPECIFIES_PROJECT]->(p:`Jira-Project`)\n" +
+                        "    (js:Server)-[:DEFINES_PROJECT]->(p:Project)\n" +
                         "RETURN\n" +
                         "    p.key, js.serverTitle");
 

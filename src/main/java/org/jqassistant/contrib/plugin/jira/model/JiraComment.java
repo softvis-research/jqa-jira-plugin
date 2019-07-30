@@ -7,7 +7,7 @@ import org.jqassistant.contrib.plugin.jira.model.basic.Jira;
 import org.jqassistant.contrib.plugin.jira.model.basic.JiraAuditInformation;
 import org.jqassistant.contrib.plugin.jira.model.basic.JiraID;
 
-@Label("Jira-Comment")
+@Label("Comment")
 public interface JiraComment extends Jira, JiraID, JiraAuditInformation {
 
     @Property("body")

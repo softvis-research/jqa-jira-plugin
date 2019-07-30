@@ -11,7 +11,7 @@ import org.jqassistant.contrib.plugin.jira.model.basic.JiraID;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-@Label("Jira-Issue")
+@Label("Issue")
 public interface JiraIssue extends Jira, JiraID, JiraAuditInformation, JiraDescription {
 
     @Property("key")

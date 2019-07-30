@@ -5,6 +5,7 @@ import org.jqassistant.contrib.plugin.jira.ids.*;
 import org.jqassistant.contrib.plugin.jira.model.*;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class caches descriptor instances which have already been created.
@@ -13,15 +14,15 @@ import java.util.HashMap;
  */
 class DescriptorCache {
 
-    private HashMap<ProjectID, JiraProject> projects;
-    private HashMap<IssueID, JiraIssue> issues;
-    private HashMap<UserID, JiraUser> users;
-    private HashMap<VersionID, JiraVersion> versions;
-    private HashMap<ComponentID, JiraComponent> components;
-    private HashMap<IssueTypeID, JiraIssueType> issueTypes;
-    private HashMap<PriorityID, JiraPriority> priorities;
-    private HashMap<StatusID, JiraStatus> statuses;
-    private HashMap<CommentID, JiraComment> comments;
+    private Map<ProjectID, JiraProject> projects;
+    private Map<IssueID, JiraIssue> issues;
+    private Map<UserID, JiraUser> users;
+    private Map<VersionID, JiraVersion> versions;
+    private Map<ComponentID, JiraComponent> components;
+    private Map<IssueTypeID, JiraIssueType> issueTypes;
+    private Map<PriorityID, JiraPriority> priorities;
+    private Map<StatusID, JiraStatus> statuses;
+    private Map<CommentID, JiraComment> comments;
 
     DescriptorCache() {
 

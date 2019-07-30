@@ -10,7 +10,7 @@ import org.jqassistant.contrib.plugin.jira.model.basic.JiraName;
 
 import java.util.List;
 
-@Label("Jira-Project")
+@Label("Project")
 public interface JiraProject extends Jira, JiraID, JiraName, JiraDescription {
 
     @Property("key")

@@ -7,7 +7,7 @@ import org.jqassistant.contrib.plugin.jira.model.basic.JiraDescription;
 import org.jqassistant.contrib.plugin.jira.model.basic.JiraID;
 import org.jqassistant.contrib.plugin.jira.model.basic.JiraName;
 
-@Label("Jira-Component")
+@Label("Component")
 public interface JiraComponent extends Jira, JiraID, JiraName, JiraDescription {
 
     @Relation("LEAD_BY")

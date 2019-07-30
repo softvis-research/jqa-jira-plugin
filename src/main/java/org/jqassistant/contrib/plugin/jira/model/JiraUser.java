@@ -5,7 +5,7 @@ import com.buschmais.xo.neo4j.api.annotation.Property;
 import org.jqassistant.contrib.plugin.jira.model.basic.Jira;
 import org.jqassistant.contrib.plugin.jira.model.basic.JiraName;
 
-@Label("Jira-User")
+@Label("User")
 public interface JiraUser extends Jira, JiraName {
 
     @Property("self")

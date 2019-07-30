@@ -9,7 +9,7 @@ import org.jqassistant.contrib.plugin.jira.model.basic.Jira;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-@Label("Jira-Server")
+@Label("Server")
 public interface JiraServer extends Jira, FileDescriptor {
 
     @Property("baseUri")
@@ -40,12 +40,12 @@ public interface JiraServer extends Jira, FileDescriptor {
     String getServerTitle();
     void setServerTitle(String serverTitle);
 
-    @Relation("SPECIFIES_PROJECT")
+    @Relation("DEFINES_PROJECT")
     List<JiraProject> getProjects();
 
-    @Relation("SPECIFIES_PRIORITY")
+    @Relation("DEFINES_PRIORITY")
     List<JiraPriority> getPriorities();
 
-    @Relation("SPECIFIES_STATUS")
+    @Relation("DEFINES_STATUS")
     List<JiraStatus> getStatuses();
 }

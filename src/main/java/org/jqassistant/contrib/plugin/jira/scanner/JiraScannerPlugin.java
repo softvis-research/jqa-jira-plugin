@@ -123,16 +123,7 @@ public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraS
                                               CacheEndpoint cacheEndpoint) {
 
         GraphBuilder graphBuilder = new GraphBuilder(xmlJiraPluginConfiguration, cacheEndpoint);
-
-        // Keep this outer try catch as jQAssistant won't log the errors correctly.
-        // Instead it will log:
-        // Exception in thread "main" com.buschmais.xo.api.XOException: There is no existing transaction.
-        try {
-            graphBuilder.startTraversal(jiraServer, xmlJiraPluginConfiguration);
-        } catch(Exception e) {
-            e.printStackTrace();
-            LOGGER.error(e.getMessage());
-        }
+        graphBuilder.startTraversal(jiraServer, xmlJiraPluginConfiguration);
     }
 }
 

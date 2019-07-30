@@ -7,7 +7,7 @@ import org.jqassistant.contrib.plugin.jira.model.basic.JiraDescription;
 import org.jqassistant.contrib.plugin.jira.model.basic.JiraID;
 import org.jqassistant.contrib.plugin.jira.model.basic.JiraName;
 
-@Label("Jira-Status")
+@Label("Status")
 public interface JiraStatus extends Jira, JiraID, JiraName, JiraDescription {
 
     @Property("iconUri")

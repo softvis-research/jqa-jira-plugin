@@ -8,7 +8,7 @@ import org.jqassistant.contrib.plugin.jira.model.basic.*;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-@Label("Jira-Issue-Link")
+@Label("Issue-Link")
 public interface JiraIssueLink extends Jira, JiraName, JiraDescription {
 
     @Property("direction")

@@ -9,7 +9,7 @@ import org.jqassistant.contrib.plugin.jira.model.basic.JiraName;
 
 import java.time.ZonedDateTime;
 
-@Label("Jira-Version")
+@Label("Version")
 public interface JiraVersion extends Jira, JiraID, JiraName, JiraDescription {
 
     @Property("isArchived")
