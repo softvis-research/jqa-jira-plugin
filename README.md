@@ -52,7 +52,7 @@ jqassistant-commandline-neo4jv3-1.6.0/bin/jqassistant.sh server
 
 ## Model
 
-![Neo4J model for the jQAssistant Jira plugin](./model.jpg)
+![Neo4j model for the jQAssistant Jira plugin](./drawio/model.jpg)
 
 ## Supported Jira Versions
 
