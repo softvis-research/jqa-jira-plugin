@@ -16,7 +16,6 @@ import org.jqassistant.contrib.plugin.jira.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.HashMap;
 
 import static org.jqassistant.contrib.plugin.jira.utils.TimeConverter.convertTime;
@@ -45,16 +44,15 @@ public class GraphBuilder {
         this.subtaskCashe = new HashMap<>();
         this.cacheEndpoint = cacheEndpoint;
 
-        String url      = xmlJiraPluginConfiguration.getUrl();
+        String url = xmlJiraPluginConfiguration.getUrl();
         String username = xmlJiraPluginConfiguration.getCredentials()
-                                                    .getUser();
+                .getUser();
         String password = xmlJiraPluginConfiguration.getCredentials()
-                                                    .getPassword();
+                .getPassword();
 
         if (System.getenv(TEST_ENV) != null) {
             jiraRestClientWrapper = new MockedJiraRestClientWrapper();
-        }
-        else {
+        } else {
             jiraRestClientWrapper = new DefaultJiraRestClientWrapper(url, username, password);
         }
     }
@@ -63,7 +61,7 @@ public class GraphBuilder {
 
         ServerInfo serverInfo = jiraRestClientWrapper.retrieveServerInfo();
         jiraServer.setBaseUri(serverInfo.getBaseUri()
-                                        .toString());
+                .toString());
         jiraServer.setVersion(serverInfo.getVersion());
         jiraServer.setBuildNumber(serverInfo.getBuildNumber());
         jiraServer.setBuildDate(convertTime(serverInfo.getBuildDate()));
@@ -75,41 +73,40 @@ public class GraphBuilder {
 
             JiraPriority jiraPriority = cacheEndpoint.findOrCreatePriority(priority);
             jiraServer.getPriorities()
-                      .add(jiraPriority);
+                    .add(jiraPriority);
         }
 
         for (Status status : jiraRestClientWrapper.retrieveStatuses()) {
 
             JiraStatus jiraStatus = cacheEndpoint.findOrCreateStatus(status);
             jiraServer.getStatuses()
-                      .add(jiraStatus);
+                    .add(jiraStatus);
         }
 
         for (XMLJiraProject xmlJiraProject : xmlJiraPluginConfiguration.getProjects()) {
 
-            Project     project     = jiraRestClientWrapper.retrieveProject(xmlJiraProject.getKey());
+            Project project = jiraRestClientWrapper.retrieveProject(xmlJiraProject.getKey());
             JiraProject jiraProject = cacheEndpoint.findOrCreateProject(project);
 
             jiraServer.getProjects()
-                      .add(jiraProject);
+                    .add(jiraProject);
 
             for (Version version : project.getVersions()) {
 
                 JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
                 jiraProject.getVersions()
-                           .add(jiraVersion);
+                        .add(jiraVersion);
             }
 
             for (IssueType issueType : project.getIssueTypes()) {
 
                 JiraIssueType jiraIssueType = cacheEndpoint.findOrCreateIssueType(issueType);
                 jiraProject.getIssueTypes()
-                           .add(jiraIssueType);
+                        .add(jiraIssueType);
             }
 
             resolveComponentsForProject(jiraProject, project.getComponents());
-            resolveLeaderForProject(jiraProject, project.getLead()
-                                                        .getSelf());
+            resolveLeaderForProject(jiraProject, project.getLead());
             resolveIssues(jiraProject);
         }
 
@@ -121,36 +118,33 @@ public class GraphBuilder {
 
         for (BasicComponent basicComponent : basicComponentList) {
 
-            Component     component     = jiraRestClientWrapper.retrieveComponent(basicComponent.getSelf());
+            Component component = jiraRestClientWrapper.retrieveComponent(basicComponent.getSelf());
             JiraComponent jiraComponent = cacheEndpoint.findOrCreateComponent(component);
 
             if (component.getLead() != null) {
-                User     componentLead = jiraRestClientWrapper.retrieveUser(component.getLead()
-                                                                                     .getSelf());
-                JiraUser jiraUser      = cacheEndpoint.findOrCreateUser(componentLead);
+
+                JiraUser jiraUser = findInCacheOrLoadFromJira(component.getLead());
                 jiraComponent.setLeader(jiraUser);
             }
 
             jiraProject.getComponents()
-                       .add(jiraComponent);
+                    .add(jiraComponent);
         }
     }
 
     /**
-     * The {@link BasicUser} which is part of the {@link Project} is not enough as it misses some fields like "name".
-     * Therefore, we have to load the complete {@link User} separately.
+     * The {@link BasicUser} which is part of the {@link Project} is not enough as it misses some fields like
+     * "emailAddress" or "active". Therefore, we have to load the complete {@link User} separately.
      */
-    private void resolveLeaderForProject(JiraProject jiraProject, URI projectLeadSelf) {
+    private void resolveLeaderForProject(JiraProject jiraProject, BasicUser basicUser) {
 
-        User projectLeadUser = jiraRestClientWrapper.retrieveUser(projectLeadSelf);
-
-        JiraUser jiraUser = cacheEndpoint.findOrCreateUser(projectLeadUser);
+        JiraUser jiraUser = findInCacheOrLoadFromJira(basicUser);
         jiraProject.setLead(jiraUser);
     }
 
     private void resolveIssues(JiraProject jiraProject) {
 
-        int batchSize         = 25;
+        int batchSize = 25;
         int currentStartIndex = 0;
 
         LOGGER.info(String.format("Loading issues from index %s to %s ...", currentStartIndex, currentStartIndex + batchSize));
@@ -164,7 +158,7 @@ public class GraphBuilder {
                 JiraIssue jiraIssue = cacheEndpoint.findOrCreateIssue(issue);
 
                 jiraProject.getIssues()
-                           .add(jiraIssue);
+                        .add(jiraIssue);
 
                 if (issue.getAssignee() != null) {
                     JiraUser assignee = cacheEndpoint.findOrCreateUser(issue.getAssignee());
@@ -180,7 +174,7 @@ public class GraphBuilder {
                 for (BasicComponent basicComponent : issue.getComponents()) {
                     JiraComponent jiraComponent = cacheEndpoint.findComponentOrThrowException(basicComponent);
                     jiraIssue.getComponents()
-                             .add(jiraComponent);
+                            .add(jiraComponent);
                 }
 
                 // We already loaded every component for the current project but we can use the default method
@@ -206,7 +200,7 @@ public class GraphBuilder {
 
                         JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
                         jiraIssue.getAffectedVersions()
-                                 .add(jiraVersion);
+                                .add(jiraVersion);
                     }
                 }
 
@@ -215,21 +209,21 @@ public class GraphBuilder {
 
                         JiraVersion jiraVersion = cacheEndpoint.findOrCreateVersion(version);
                         jiraIssue.getFixedVersions()
-                                 .add(jiraVersion);
+                                .add(jiraVersion);
                     }
                 }
 
                 if (issue.getIssueLinks() != null) {
                     IssueID issueID = IssueID.builder()
-                                             .jiraId(jiraIssue.getJiraId())
-                                             .build();
+                            .jiraId(jiraIssue.getJiraId())
+                            .build();
                     issueLinkCashe.put(issueID, issue.getIssueLinks());
                 }
 
                 if (issue.getSubtasks() != null) {
                     IssueID issueID = IssueID.builder()
-                                             .jiraId(jiraIssue.getJiraId())
-                                             .build();
+                            .jiraId(jiraIssue.getJiraId())
+                            .build();
                     subtaskCashe.put(issueID, issue.getSubtasks());
                 }
             }
@@ -248,22 +242,18 @@ public class GraphBuilder {
 
         if (comment.getAuthor() != null) {
 
-            User     commentAuthor = jiraRestClientWrapper.retrieveUser(comment.getAuthor()
-                                                                               .getSelf());
-            JiraUser jiraUser      = cacheEndpoint.findOrCreateUser(commentAuthor);
+            JiraUser jiraUser = findInCacheOrLoadFromJira(comment.getAuthor());
             jiraComment.setAuthor(jiraUser);
         }
 
         if (comment.getUpdateAuthor() != null) {
 
-            User     commentUpdateAuthor = jiraRestClientWrapper.retrieveUser(comment.getUpdateAuthor()
-                                                                                     .getSelf());
-            JiraUser jiraUser            = cacheEndpoint.findOrCreateUser(commentUpdateAuthor);
+            JiraUser jiraUser = findInCacheOrLoadFromJira(comment.getUpdateAuthor());
             jiraComment.setUpdateAuthor(jiraUser);
         }
 
         jiraIssue.getComments()
-                 .add(jiraComment);
+                .add(jiraComment);
     }
 
     private void resolveIssueLinks() {
@@ -276,30 +266,29 @@ public class GraphBuilder {
                     // Always create the IssueLink, even if the target can not be resolved.
                     JiraIssueLink jiraIssueLink = cacheEndpoint.createIssueLink(issueLink);
                     cacheEndpoint.findIssueOrThrowException(issueID)
-                                 .getIssueLinks()
-                                 .add(jiraIssueLink);
+                            .getIssueLinks()
+                            .add(jiraIssueLink);
 
                     // This solution is a bit hacky.
                     // Have a look at IssueID.java to understand why this is necessary.
                     String targetIssueUri = issueLink.getTargetIssueUri()
-                                                     .toString();
-                    long   targetIssueId  = Long.valueOf(targetIssueUri.substring(targetIssueUri.lastIndexOf('/') + 1));
+                            .toString();
+                    long targetIssueId = Long.valueOf(targetIssueUri.substring(targetIssueUri.lastIndexOf('/') + 1));
 
                     // This can throw an exception as the target issue does not need to be part of the project.
-                    IssueID   targetIssueID = IssueID.builder()
-                                                     .jiraId(targetIssueId)
-                                                     .build();
-                    JiraIssue targetIssue   = cacheEndpoint.findIssueOrThrowException(targetIssueID);
+                    IssueID targetIssueID = IssueID.builder()
+                            .jiraId(targetIssueId)
+                            .build();
+                    JiraIssue targetIssue = cacheEndpoint.findIssueOrThrowException(targetIssueID);
 
                     jiraIssueLink.setTargetIssue(targetIssue);
 
-                }
-                catch (EntityNotFoundException e) {
+                } catch (EntityNotFoundException e) {
 
                     LOGGER.warn(String.format("Creating a link between issues failed with message: '%s'. Here is the 'IssueLink' object: " +
-                                              "'%s'. This can happen as issue links can point at issues which have not been loaded, e.g. " +
-                                              "if they are in other projects.",
-                                              issueLink.toString(), e.getMessage()));
+                                    "'%s'. This can happen as issue links can point at issues which have not been loaded, e.g. " +
+                                    "if they are in other projects.",
+                            issueLink.toString(), e.getMessage()));
                 }
             }
         }
@@ -313,18 +302,29 @@ public class GraphBuilder {
 
                 // This solution is a bit hacky.
                 // Have a look at IssueID.java to understand why this is necessary.
-                String    targetIssueUri = subtask.getIssueUri()
-                                                  .toString();
-                long      targetIssueId  = Long.valueOf(targetIssueUri.substring(targetIssueUri.lastIndexOf('/') + 1));
-                IssueID   targetIssueID  = IssueID.builder()
-                                                  .jiraId(targetIssueId)
-                                                  .build();
-                JiraIssue targetIssue    = cacheEndpoint.findIssueOrThrowException(targetIssueID);
+                String targetIssueUri = subtask.getIssueUri()
+                        .toString();
+                long targetIssueId = Long.valueOf(targetIssueUri.substring(targetIssueUri.lastIndexOf('/') + 1));
+                IssueID targetIssueID = IssueID.builder()
+                        .jiraId(targetIssueId)
+                        .build();
+                JiraIssue targetIssue = cacheEndpoint.findIssueOrThrowException(targetIssueID);
 
                 JiraIssue sourceIssue = cacheEndpoint.findIssueOrThrowException(issueID);
                 sourceIssue.getSubtasks()
-                           .add(targetIssue);
+                        .add(targetIssue);
             }
         }
+    }
+
+    private JiraUser findInCacheOrLoadFromJira(BasicUser basicUser) {
+
+        if (cacheEndpoint.isUserAlreadyCached(basicUser)) {
+
+            return cacheEndpoint.findUserOrThrowException(basicUser);
+        }
+
+        User userInJira = jiraRestClientWrapper.retrieveUser(basicUser.getSelf());
+        return cacheEndpoint.findOrCreateUser(userInJira);
     }
 }

@@ -90,6 +90,23 @@ public class CacheEndpoint {
         return jiraIssue;
     }
 
+    public boolean isUserAlreadyCached(BasicUser basicUser) {
+
+        UserID userID = UserID.builder().name(basicUser.getName()).build();
+        return descriptorCache.get(userID) != null;
+    }
+
+    public JiraUser findUserOrThrowException(BasicUser basicUser) {
+
+        UserID userID = UserID.builder().name(basicUser.getName()).build();
+        JiraUser jiraUser = descriptorCache.get(userID);
+
+        if (jiraUser == null) {
+            throw new IllegalArgumentException("We can't find a JiraUser with ID: " + userID);
+        }
+
+        return jiraUser;
+    }
 
     public JiraUser findOrCreateUser(User user) {
 

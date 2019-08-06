@@ -49,6 +49,13 @@ You can then start a local Neo4j server to start querying the database at [http:
 jqassistant-commandline-neo4jv3-1.6.0/bin/jqassistant.sh server
 ```
 
+## Custom Certificate
+
+If you use a self-signed certificate register it with the [Keytool](http://tutorials.jenkov.com/java-cryptography/keytool.html):
+
+```bash
+keytool -import -alias JIRA -file jira.crt -keystore $JAVA_HOME/jre/lib/security/cacerts
+```
 
 ## Model
 
@@ -82,7 +89,7 @@ The first Jira instance we scanned had the following entity counts:
 | User        | ~50   |
 | Issue Link  | ~1400 |
 
-The scan took a total of 11 minutes.
+The scan took a total of 9 minutes.
 
 ## Rate Limits
 
