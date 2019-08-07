@@ -122,14 +122,12 @@ public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraS
                                               XMLJiraPluginConfiguration xmlJiraPluginConfiguration,
                                               CacheEndpoint cacheEndpoint) {
 
-        GraphBuilder graphBuilder;
         try {
-            graphBuilder = new GraphBuilder(xmlJiraPluginConfiguration, cacheEndpoint);
-        } catch (IllegalAccessException | InstantiationException | ClassNotFoundException e) {
+            GraphBuilder graphBuilder = new GraphBuilder(xmlJiraPluginConfiguration, cacheEndpoint);
+            graphBuilder.startTraversal(jiraServer, xmlJiraPluginConfiguration);
+        } catch (Exception e) {
             e.printStackTrace();
-            return;
         }
-        graphBuilder.startTraversal(jiraServer, xmlJiraPluginConfiguration);
     }
 }
 

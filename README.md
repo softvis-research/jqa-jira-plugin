@@ -178,17 +178,10 @@ If it does not work with your Jira instance please open an **Issue** and write y
 A real benchmark does not make sense as the performance of the plugin depends on the performance of the Jira instance. Nevertheless, we 
 want to provide some numbers which we received while testing the plugin against available Jira instances.
 
-### Instance 1
-
-The first Jira instance we scanned had the following entity counts:
-
-| Entity Name | Count |
-|-------------|-------|
-| Issue       | ~7400 |
-| User        | ~50   |
-| Issue Link  | ~1400 |
-
-The scan took a total of 9 minutes.
+| Instance | Issue Count | User Count | Issue Link Count | Time to Scan |
+|----------|-------------|------------|------------------|--------------|
+| #1       | ~7400       | ~50        | ~1400            | ~9 min       |
+| #2       | ~1550       | ~1400      | ~100             | ~5 min       |
 
 ## Rate Limits
 
