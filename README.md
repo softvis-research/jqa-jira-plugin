@@ -61,6 +61,105 @@ keytool -import -alias JIRA -file jira.crt -keystore $JAVA_HOME/jre/lib/security
 
 ![Neo4j model for the jQAssistant Jira plugin](./drawio/model.jpg)
 
+## Use Cases
+
+### Overview
+
+Count bugs per release:
+
+```java
+MATCH 
+    (t:IssueType {name:'Bug'})<-[:IS_OF_TYPE]-(i:Issue)-[:AFFECTS]->(v:Version) 
+RETURN 
+    v.name as Version, count(i) as `Bug Total`
+ORDER BY
+    `Bug Total` DESC
+```
+
+Count bugs by priority:
+
+```java
+MATCH 
+    (t:IssueType {name:'Bug'})<-[:IS_OF_TYPE]-(i:Issue)-[:IS_OF_PRIORITY]->(p:Priority) 
+RETURN 
+    p.name as Priority, count(i) as `Issue Total`
+ORDER BY
+    `Issue Total` DESC
+```
+
+Count issues by status:
+
+```java
+MATCH 
+    (i:Issue)-[:HAS_STATUS]->(s:Status) 
+RETURN 
+    s.name as Status, count(i) as `Issue Total`
+ORDER BY
+    `Issue Total` DESC
+```
+
+### User Overview
+
+Count reported issues per user:
+
+
+```java
+MATCH 
+    (i:Issue)-[:REPORTED_BY]->(u:User) 
+RETURN 
+    u.name as User, count(i) as `Issue Total`
+ORDER BY
+    `Issue Total` DESC
+```
+
+Count assigned issues per user:
+
+```java
+MATCH 
+    (i:Issue)-[:ASSIGNED_TO]->(u:User) 
+RETURN 
+    u.name as User, count(i) as `Issue Total`
+ORDER BY
+    `Issue Total` DESC
+```
+
+### Issue Relations
+
+Show issues with few links to other issues. Those are probably ones which can always be implemented:
+
+```java
+MATCH 
+    (i:Issue)
+RETURN 
+    i.key as Issue, SIZE((i)-[:HAS_LINK]->()) as `Link Total`
+ORDER BY
+    `Link Total` ASC
+```
+
+Show issues which are referenced by a lot of other issues. Those issues should be solved as soon as possible.
+
+```java
+MATCH 
+    (i:Issue)
+RETURN 
+    i.key as Issue, SIZE((i)<-[:POINTS_AT]-()) as `Reference Total`
+ORDER BY
+    `Reference Total` DESC
+```
+
+### Issue Quality
+
+Show issues with a lot of comments. Probably the first description was not clear enough:
+
+```java
+MATCH 
+    (i:Issue)
+RETURN 
+    i.key as Issue, SIZE((i)-[:HAS_COMMENT]->()) as `Comment Total`
+ORDER BY
+    `Comment Total` DESC
+```
+
 ## Supported Jira Versions
 
 Unfortunately, we did not find any documentation which Jira versions are supported by the [JIRA REST Java Client](https://mvnrepository.com/artifact/com.atlassian.jira/jira-rest-java-client-api/5.1.1-e0dd194).
