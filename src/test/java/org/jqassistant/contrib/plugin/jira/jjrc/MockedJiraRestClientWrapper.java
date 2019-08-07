@@ -1,7 +1,6 @@
-package org.jqassistant.contrib.plugin.jira.jjrc.mock;
+package org.jqassistant.contrib.plugin.jira.jjrc;
 
 import com.atlassian.jira.rest.client.api.domain.*;
-import org.jqassistant.contrib.plugin.jira.jjrc.JiraRestClientWrapper;
 
 import java.net.URI;
 import java.util.Collections;

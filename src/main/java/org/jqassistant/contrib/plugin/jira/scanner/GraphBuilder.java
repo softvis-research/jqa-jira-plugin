@@ -7,7 +7,6 @@ import org.jqassistant.contrib.plugin.jira.cache.CacheEndpoint;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraPluginConfiguration;
 import org.jqassistant.contrib.plugin.jira.jjrc.DefaultJiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.jjrc.JiraRestClientWrapper;
-import org.jqassistant.contrib.plugin.jira.jjrc.mock.MockedJiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.model.JiraServer;
 import org.jqassistant.contrib.plugin.jira.scanner.builder.*;
 
@@ -28,7 +27,7 @@ public class GraphBuilder {
     private final SubtaskRelationBuilder subtaskRelationBuilder;
     private final ProjectBuilder projectBuilder;
 
-    GraphBuilder(XMLJiraPluginConfiguration xmlJiraPluginConfiguration, CacheEndpoint cacheEndpoint) {
+    GraphBuilder(XMLJiraPluginConfiguration xmlJiraPluginConfiguration, CacheEndpoint cacheEndpoint) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
 
         JiraRestClientWrapper jiraRestClientWrapper = this.initializeJiraRestClientWrapper(xmlJiraPluginConfiguration);
 
@@ -46,14 +45,17 @@ public class GraphBuilder {
         this.projectBuilder = new ProjectBuilder(cacheEndpoint, jiraRestClientWrapper, componentBuilder, issueBuilder, userBuilder);
     }
 
-    private JiraRestClientWrapper initializeJiraRestClientWrapper(XMLJiraPluginConfiguration xmlJiraPluginConfiguration) {
+    private JiraRestClientWrapper initializeJiraRestClientWrapper(XMLJiraPluginConfiguration xmlJiraPluginConfiguration) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
 
         String url = xmlJiraPluginConfiguration.getUrl();
         String username = xmlJiraPluginConfiguration.getCredentials().getUser();
         String password = xmlJiraPluginConfiguration.getCredentials().getPassword();
 
         if (System.getenv(TEST_ENV) != null) {
-            return new MockedJiraRestClientWrapper();
+            return (JiraRestClientWrapper) GraphBuilder.class
+                    .getClassLoader()
+                    .loadClass("org.jqassistant.contrib.plugin.jira.jjrc.MockedJiraRestClientWrapper")
+                    .newInstance();
         } else {
             return new DefaultJiraRestClientWrapper(url, username, password);
         }

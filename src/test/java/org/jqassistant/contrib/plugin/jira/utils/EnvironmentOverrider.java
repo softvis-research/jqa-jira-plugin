@@ -1,6 +1,6 @@
 package org.jqassistant.contrib.plugin.jira.utils;
 
-import org.jqassistant.contrib.plugin.jira.jjrc.mock.MockedJiraRestClientWrapper;
+import org.jqassistant.contrib.plugin.jira.jjrc.MockedJiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.scanner.GraphBuilder;
 import org.jqassistant.contrib.plugin.jira.scanner.ScannerTest;
 import org.slf4j.Logger;
