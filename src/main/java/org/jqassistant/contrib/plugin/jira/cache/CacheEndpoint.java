@@ -27,8 +27,6 @@ import static org.jqassistant.contrib.plugin.jira.utils.TimeConverter.convertTim
  */
 public class CacheEndpoint {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CacheEndpoint.class);
-
     private final Store store;
     private DescriptorCache descriptorCache;
 
