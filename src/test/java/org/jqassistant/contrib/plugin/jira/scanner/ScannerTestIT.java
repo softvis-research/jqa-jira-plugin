@@ -17,7 +17,7 @@ import java.util.Objects;
 import static org.jqassistant.contrib.plugin.jira.utils.TimeConverter.convertTime;
 import static org.junit.Assert.*;
 
-public class ScannerTest extends AbstractPluginIT {
+public class ScannerTestIT extends AbstractPluginIT {
 
     @BeforeClass
     public static void setTestEnvironmentVariables() throws Exception {

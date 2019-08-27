@@ -7,7 +7,7 @@ import org.junit.Test;
 import java.io.File;
 import java.util.Objects;
 
-public class InvalidConfigurationTest extends AbstractPluginIT {
+public class InvalidConfigurationTestIT extends AbstractPluginIT {
 
     private static final String INVALID_CONFIGURATION_FILE = "scanner/invalid/jira-plugin-configuration.xml";
 

@@ -2,7 +2,7 @@ package org.jqassistant.contrib.plugin.jira.utils;
 
 import org.jqassistant.contrib.plugin.jira.jjrc.MockedJiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.scanner.GraphBuilder;
-import org.jqassistant.contrib.plugin.jira.scanner.ScannerTest;
+import org.jqassistant.contrib.plugin.jira.scanner.ScannerTestIT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,7 @@ import static org.jqassistant.contrib.plugin.jira.scanner.GraphBuilder.TEST_ENV;
 
 public abstract class EnvironmentOverrider {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScannerTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScannerTestIT.class);
 
     public static void setTestEnvironmentVariables() throws Exception {
 
