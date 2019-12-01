@@ -2,7 +2,10 @@ package org.jqassistant.contrib.plugin.jira.jjrc;
 
 import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.api.domain.*;
+import com.atlassian.jira.rest.client.auth.AnonymousAuthenticationHandler;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
+import org.jqassistant.contrib.plugin.jira.jdom.XMLCredentials;
+import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraPluginConfiguration;
 
 import java.net.URI;
 import java.util.Collections;
@@ -11,7 +14,7 @@ import java.util.Set;
 /**
  * The default implementation for the {@link JiraRestClientWrapper} uses the {@link JiraRestClient} to
  * retrieve data from a Jira instance.
- *
+ * <p>
  * All data is loaded synchronously.
  */
 public class DefaultJiraRestClientWrapper implements JiraRestClientWrapper {
@@ -21,10 +24,18 @@ public class DefaultJiraRestClientWrapper implements JiraRestClientWrapper {
 
     private final JiraRestClient jiraRestClient;
 
-    public DefaultJiraRestClientWrapper(String url, String username, String password) {
+    public DefaultJiraRestClientWrapper(XMLJiraPluginConfiguration xmlJiraPluginConfiguration) {
 
-        jiraRestClient = new AsynchronousJiraRestClientFactory()
-                .createWithBasicHttpAuthentication(URI.create(url), username, password);
+        AsynchronousJiraRestClientFactory clientFactory = new AsynchronousJiraRestClientFactory();
+        URI uri = URI.create(xmlJiraPluginConfiguration.getUrl());
+
+        if (xmlJiraPluginConfiguration.getCredentials().isPresent()) {
+            XMLCredentials xmlCredentials = xmlJiraPluginConfiguration.getCredentials().get();
+            jiraRestClient = clientFactory.createWithBasicHttpAuthentication(uri, xmlCredentials.getUser(), xmlCredentials.getPassword());
+            return;
+        }
+
+        jiraRestClient = clientFactory.create(uri, new AnonymousAuthenticationHandler());
     }
 
     @Override

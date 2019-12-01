@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Getter
 public class XMLJiraPluginConfiguration {
 
     private String url;
-    private XMLCredentials credentials;
+    private Optional<XMLCredentials> credentials;
     private List<XMLJiraProject> projects;
 }

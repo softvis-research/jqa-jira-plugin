@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The {@link XMLParser} class contains two functions which parse the configuration file for the Jira plugin.
@@ -43,7 +44,7 @@ public class XMLParser {
         Document document = builder.build(inputStream);
 
         String jiraUrl = this.parseJiraUrl(document);
-        XMLCredentials xmlCredentials = this.parseCredentials(document);
+        Optional<XMLCredentials> xmlCredentials = this.parseCredentials(document);
         List<XMLJiraProject> xmlJiraProjectList = this.parseJiraProjects(document);
 
         return new XMLJiraPluginConfiguration(jiraUrl, xmlCredentials, xmlJiraProjectList);
@@ -55,14 +56,18 @@ public class XMLParser {
         return document.getRootElement().getChildText(URL_ELEMENT_NAME);
     }
 
-    private XMLCredentials parseCredentials(Document document) {
+    private Optional<XMLCredentials> parseCredentials(Document document) {
 
         Element credentialsElement = document.getRootElement().getChild(CREDENTIALS_ELEMENT_NAME);
+
+        if (credentialsElement == null) {
+            return Optional.empty();
+        }
 
         String username = credentialsElement.getChildText(USERNAME_ELEMENT_NAME);
         String password = credentialsElement.getChildText(PASSWORD_ELEMENT_NAME);
 
-        return new XMLCredentials(username, password);
+        return Optional.of(new XMLCredentials(username, password));
     }
 
     private List<XMLJiraProject> parseJiraProjects(Document document) {

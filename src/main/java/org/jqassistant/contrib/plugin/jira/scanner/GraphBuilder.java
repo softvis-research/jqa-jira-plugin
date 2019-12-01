@@ -55,11 +55,7 @@ public class GraphBuilder {
             }
 
         } else {
-            String url = xmlJiraPluginConfiguration.getUrl();
-            String username = xmlJiraPluginConfiguration.getCredentials().getUser();
-            String password = xmlJiraPluginConfiguration.getCredentials().getPassword();
-
-            return new DefaultJiraRestClientWrapper(url, username, password);
+            return new DefaultJiraRestClientWrapper(xmlJiraPluginConfiguration);
         }
     }
 
