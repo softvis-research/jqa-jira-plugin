@@ -5,9 +5,10 @@ import com.atlassian.jira.rest.client.api.domain.BasicProject;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import io.atlassian.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.StringUtils;
 
 import java.net.URI;
 
@@ -27,14 +28,18 @@ public class RateLimitsTest {
 
     private static JiraRestClient jiraRestClient;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpJiraRestClient() {
+
+        if (StringUtils.isBlank(USERNAME) || StringUtils.isBlank(PASSWORD) || StringUtils.isBlank(URL)) {
+            return;
+        }
 
         jiraRestClient = new AsynchronousJiraRestClientFactory()
                 .createWithBasicHttpAuthentication(URI.create(URL), USERNAME, PASSWORD);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void when_oneRequestIsMadeAgainstJira_succeed() {
 
@@ -47,11 +52,11 @@ public class RateLimitsTest {
         }
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void when_fivehundredRequestAreMadeAgainstJira_succeed() {
 
-        for(int i = 0; i < 500; i++) {
+        for (int i = 0; i < 500; i++) {
 
             if (i % 10 == 0) {
                 log.info("{} requests made against JIRA", i);

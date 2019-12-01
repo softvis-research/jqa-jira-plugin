@@ -1,10 +1,11 @@
 package org.jqassistant.contrib.plugin.jira.jdom;
 
 import org.jdom2.JDOMException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class XMLParsingTest {
 
@@ -18,14 +19,14 @@ public class XMLParsingTest {
         XMLJiraPluginConfiguration xmlJiraPluginConfiguration = xmlParser.parseConfiguration(
                 this.getClass().getClassLoader().getResourceAsStream(TEST_CONFIGURATION_FILE_NAME));
 
-        Assert.assertEquals("http://localhost:32763", xmlJiraPluginConfiguration.getUrl());
+        assertEquals("http://localhost:32763", xmlJiraPluginConfiguration.getUrl());
 
-        Assert.assertEquals("testuser", xmlJiraPluginConfiguration.getCredentials().getUser());
-        Assert.assertEquals("secret", xmlJiraPluginConfiguration.getCredentials().getPassword());
+        assertEquals("testuser", xmlJiraPluginConfiguration.getCredentials().getUser());
+        assertEquals("secret", xmlJiraPluginConfiguration.getCredentials().getPassword());
 
 
-        Assert.assertEquals(2, xmlJiraPluginConfiguration.getProjects().size());
-        Assert.assertEquals("Project X", xmlJiraPluginConfiguration.getProjects().get(0).getKey());
-        Assert.assertEquals("Project Y", xmlJiraPluginConfiguration.getProjects().get(1).getKey());
+        assertEquals(2, xmlJiraPluginConfiguration.getProjects().size());
+        assertEquals("Project X", xmlJiraPluginConfiguration.getProjects().get(0).getKey());
+        assertEquals("Project Y", xmlJiraPluginConfiguration.getProjects().get(1).getKey());
     }
 }

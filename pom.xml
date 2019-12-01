@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.jqassistant.contrib.common</groupId>
         <artifactId>parent</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.0</version>
     </parent>
 
     <groupId>org.jqassistant.contrib.plugin</groupId>
@@ -40,6 +40,13 @@
             <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
         </license>
     </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:softvis-research/jqa-jira-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:softvis-research/jqa-jira-plugin.git</developerConnection>
+        <url>https://github.com/softvis-research/jqa-jira-plugin.git</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <repositories>
         <repository>
@@ -103,7 +110,7 @@
                 <version>0.8.4</version>
                 <configuration>
                     <excludes>
-<!--                        We remove the JJRC wrapper from the scan as it gets mocked in the tests-->
+                        <!--We remove the JJRC wrapper from the scan as it gets mocked in the tests-->
                         <exclude>**/DefaultJiraRestClientWrapper.*</exclude>
                         <exclude>**/Mocked*</exclude>
                         <exclude>**/ids/*ID*</exclude>
@@ -187,6 +194,13 @@
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-rest-java-client-core</artifactId>
             <version>5.1.1-e0dd194</version>
+
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- This dependency is needed because the application will throw the following error on startup otherwise:-->
@@ -266,20 +280,26 @@
             <version>${org.hamcrest.version}</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+        </dependency>
+        <!-- Declared to detect ambiguities between data models of bytecode and src parser -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <!-- Declared to detect ambiguities between data models of bytecode and src parser -->
-        <dependency>
-            <groupId>com.buschmais.jqassistant.plugin</groupId>
-            <artifactId>java</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

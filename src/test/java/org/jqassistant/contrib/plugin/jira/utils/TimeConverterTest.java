@@ -1,8 +1,8 @@
 package org.jqassistant.contrib.plugin.jira.utils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 public class TimeConverterTest {

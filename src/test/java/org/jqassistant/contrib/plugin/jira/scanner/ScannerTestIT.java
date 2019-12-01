@@ -8,18 +8,20 @@ import org.jqassistant.contrib.plugin.jira.jjrc.MockedProject;
 import org.jqassistant.contrib.plugin.jira.jjrc.MockedServerInfo;
 import org.jqassistant.contrib.plugin.jira.model.JiraServer;
 import org.jqassistant.contrib.plugin.jira.utils.EnvironmentOverrider;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Objects;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.jqassistant.contrib.plugin.jira.utils.TimeConverter.convertTime;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ScannerTestIT extends AbstractPluginIT {
 
-    @BeforeClass
+    @BeforeAll
     public static void setTestEnvironmentVariables() throws Exception {
         EnvironmentOverrider.setTestEnvironmentVariables();
     }

@@ -2,7 +2,7 @@ package org.jqassistant.contrib.plugin.jira.scanner;
 
 import com.buschmais.jqassistant.core.scanner.api.DefaultScope;
 import com.buschmais.jqassistant.plugin.common.test.AbstractPluginIT;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Objects;
