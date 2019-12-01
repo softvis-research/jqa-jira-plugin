@@ -40,18 +40,18 @@ you to use your email as login name as well. This is not possible when querying 
 Now scan your configuration and wait for the plugin to finish:
 
 ```bash
-jqassistant-commandline-neo4jv3-1.6.0/bin/jqassistant.sh scan -f jira-plugin-configuration.xml
+jqassistant.sh scan -f jira-plugin-configuration.xml
 ```
 
 You can then start a local Neo4j server to start querying the database at [http://localhost:7474](http://localhost:7474):
 
 ```bash
-jqassistant-commandline-neo4jv3-1.6.0/bin/jqassistant.sh server
+jqassistant.sh server
 ```
 
-## Custom Certificate
+## Self-Signed Certificate
 
-If you use a self-signed certificate register it with the [Keytool](http://tutorials.jenkov.com/java-cryptography/keytool.html):
+If your JIRA instance uses a self-signed certificate register it with the [Keytool](http://tutorials.jenkov.com/java-cryptography/keytool.html):
 
 ```bash
 keytool -import -alias JIRA -file jira.crt -keystore $JAVA_HOME/jre/lib/security/cacerts
