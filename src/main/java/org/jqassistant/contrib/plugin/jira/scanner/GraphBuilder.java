@@ -10,15 +10,13 @@ import org.jqassistant.contrib.plugin.jira.jjrc.JiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.model.JiraServer;
 import org.jqassistant.contrib.plugin.jira.scanner.builder.*;
 
+import java.io.IOException;
+
 /**
  * The GraphBuilder gets build only once per execution of the Jira plugin
  * {@link JiraScannerPlugin#scan(FileResource, String, Scope, Scanner)} method.
  */
 public class GraphBuilder {
-
-    // FIXME: We should find a better solution to switch between the mocked and the default implementation.
-    // After fixing this we can also move the mock classes to the test package.
-    public static String TEST_ENV = "JQASSISTANT_JIRA_PLUGIN_TEST";
 
     private final ServerInfoBuilder serverInfoBuilder;
     private final PriorityBuilder priorityBuilder;
@@ -27,7 +25,7 @@ public class GraphBuilder {
     private final SubtaskRelationBuilder subtaskRelationBuilder;
     private final ProjectBuilder projectBuilder;
 
-    GraphBuilder(XMLJiraPluginConfiguration xmlJiraPluginConfiguration, CacheEndpoint cacheEndpoint) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+    GraphBuilder(XMLJiraPluginConfiguration xmlJiraPluginConfiguration, CacheEndpoint cacheEndpoint) throws IOException {
 
         JiraRestClientWrapper jiraRestClientWrapper = this.initializeJiraRestClientWrapper(xmlJiraPluginConfiguration);
 
@@ -45,18 +43,22 @@ public class GraphBuilder {
         this.projectBuilder = new ProjectBuilder(cacheEndpoint, jiraRestClientWrapper, componentBuilder, issueBuilder, userBuilder);
     }
 
-    private JiraRestClientWrapper initializeJiraRestClientWrapper(XMLJiraPluginConfiguration xmlJiraPluginConfiguration) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    private JiraRestClientWrapper initializeJiraRestClientWrapper(XMLJiraPluginConfiguration xmlJiraPluginConfiguration) throws IOException {
 
-        String url = xmlJiraPluginConfiguration.getUrl();
-        String username = xmlJiraPluginConfiguration.getCredentials().getUser();
-        String password = xmlJiraPluginConfiguration.getCredentials().getPassword();
+        String restClientClass = System.getProperty(JiraRestClientWrapper.class.getName());
+        if (restClientClass != null) {
 
-        if (System.getenv(TEST_ENV) != null) {
-            return (JiraRestClientWrapper) GraphBuilder.class
-                    .getClassLoader()
-                    .loadClass("org.jqassistant.contrib.plugin.jira.jjrc.MockedJiraRestClientWrapper")
-                    .newInstance();
+            try {
+                return (JiraRestClientWrapper) Thread.currentThread().getContextClassLoader().loadClass(restClientClass).newInstance();
+            } catch (ReflectiveOperationException e) {
+                throw new IOException("Cannot load class " + restClientClass);
+            }
+
         } else {
+            String url = xmlJiraPluginConfiguration.getUrl();
+            String username = xmlJiraPluginConfiguration.getCredentials().getUser();
+            String password = xmlJiraPluginConfiguration.getCredentials().getPassword();
+
             return new DefaultJiraRestClientWrapper(url, username, password);
         }
     }

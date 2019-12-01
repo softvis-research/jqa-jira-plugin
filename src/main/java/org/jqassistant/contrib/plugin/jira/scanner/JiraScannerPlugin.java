@@ -27,7 +27,7 @@ public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraS
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JiraScannerPlugin.class);
 
-    private static final String JQASSISTANT_PLUGIN_JIRA_FILENAME = "jqassistant.plugin.jira.filename";
+    private static final String JQASSISTANT_PLUGIN_JIRA_FILENAME = "jira.configuration.file";
 
     private String jiraFileName = "jira-plugin-configuration.xml";
 
@@ -120,14 +120,10 @@ public class JiraScannerPlugin extends AbstractScannerPlugin<FileResource, JiraS
 
     private void buildCompleteDescriptorGraph(JiraServer jiraServer,
                                               XMLJiraPluginConfiguration xmlJiraPluginConfiguration,
-                                              CacheEndpoint cacheEndpoint) {
+                                              CacheEndpoint cacheEndpoint) throws IOException {
 
-        try {
-            GraphBuilder graphBuilder = new GraphBuilder(xmlJiraPluginConfiguration, cacheEndpoint);
-            graphBuilder.startTraversal(jiraServer, xmlJiraPluginConfiguration);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        GraphBuilder graphBuilder = new GraphBuilder(xmlJiraPluginConfiguration, cacheEndpoint);
+        graphBuilder.startTraversal(jiraServer, xmlJiraPluginConfiguration);
     }
 }
 

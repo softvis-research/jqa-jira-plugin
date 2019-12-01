@@ -34,7 +34,7 @@ public interface JiraIssue extends Jira, JiraID, JiraAuditInformation, JiraDescr
     JiraUser getAssignee();
     void setAssignee(JiraUser jiraUser);
 
-    @Relation("CONCERNES")
+    @Relation("CONCERNS")
     List<JiraComponent> getComponents();
 
     @Relation("IS_OF_TYPE")

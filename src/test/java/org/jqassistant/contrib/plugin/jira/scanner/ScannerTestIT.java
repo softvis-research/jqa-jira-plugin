@@ -4,10 +4,11 @@ import com.buschmais.jqassistant.core.scanner.api.DefaultScope;
 import com.buschmais.jqassistant.core.store.api.model.Descriptor;
 import com.buschmais.jqassistant.plugin.common.test.AbstractPluginIT;
 import org.hamcrest.CoreMatchers;
+import org.jqassistant.contrib.plugin.jira.jjrc.JiraRestClientWrapper;
+import org.jqassistant.contrib.plugin.jira.jjrc.MockedJiraRestClientWrapper;
 import org.jqassistant.contrib.plugin.jira.jjrc.MockedProject;
 import org.jqassistant.contrib.plugin.jira.jjrc.MockedServerInfo;
 import org.jqassistant.contrib.plugin.jira.model.JiraServer;
-import org.jqassistant.contrib.plugin.jira.utils.EnvironmentOverrider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -22,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class ScannerTestIT extends AbstractPluginIT {
 
     @BeforeAll
-    public static void setTestEnvironmentVariables() throws Exception {
-        EnvironmentOverrider.setTestEnvironmentVariables();
+    public static void setTestEnvironmentVariables() {
+        System.setProperty(JiraRestClientWrapper.class.getName(), MockedJiraRestClientWrapper.class.getName());
     }
 
     @Test
