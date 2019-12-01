@@ -11,7 +11,7 @@
 
     <groupId>org.jqassistant.contrib.plugin</groupId>
     <artifactId>jqa-jira-plugin</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 
     <name>jQAssistant Jira Plugin</name>
     <description>The jQAssistant plugin to scan and to analyze a Jira instance.</description>
