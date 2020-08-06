@@ -11,7 +11,7 @@
 
     <groupId>org.jqassistant.contrib.plugin</groupId>
     <artifactId>jqa-jira-plugin</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
 
     <name>jQAssistant Jira Plugin</name>
     <description>The jQAssistant plugin to scan and to analyze a Jira instance.</description>
@@ -104,33 +104,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.4</version>
-                <configuration>
-                    <excludes>
-                        <!--We remove the JJRC wrapper from the scan as it gets mocked in the tests-->
-                        <exclude>**/DefaultJiraRestClientWrapper.*</exclude>
-                        <exclude>**/Mocked*</exclude>
-                        <exclude>**/ids/*ID*</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
 
             <!--https://spotbugs.readthedocs.io/en/latest/maven.html-->
             <plugin>
@@ -193,7 +166,7 @@
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-rest-java-client-core</artifactId>
-            <version>5.1.1-e0dd194</version>
+            <version>5.2.0</version>
 
             <exclusions>
                 <exclusion>

@@ -4,6 +4,7 @@ import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.api.domain.*;
 import com.atlassian.jira.rest.client.auth.AnonymousAuthenticationHandler;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
+import org.jqassistant.contrib.plugin.jira.jdom.XMLApiToken;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLCredentials;
 import org.jqassistant.contrib.plugin.jira.jdom.XMLJiraPluginConfiguration;
 
@@ -29,7 +30,16 @@ public class DefaultJiraRestClientWrapper implements JiraRestClientWrapper {
         AsynchronousJiraRestClientFactory clientFactory = new AsynchronousJiraRestClientFactory();
         URI uri = URI.create(xmlJiraPluginConfiguration.getUrl());
 
+        if (xmlJiraPluginConfiguration.getApiToken().isPresent()) {
+
+            XMLApiToken xmlApiToken = xmlJiraPluginConfiguration.getApiToken().get();
+            JiraAuthenticationHandler jiraAuthenticationHandler = new JiraAuthenticationHandler(xmlApiToken);
+            jiraRestClient = clientFactory.createWithAuthenticationHandler(uri, jiraAuthenticationHandler);
+            return;
+        }
+
         if (xmlJiraPluginConfiguration.getCredentials().isPresent()) {
+
             XMLCredentials xmlCredentials = xmlJiraPluginConfiguration.getCredentials().get();
             jiraRestClient = clientFactory.createWithBasicHttpAuthentication(uri, xmlCredentials.getUser(), xmlCredentials.getPassword());
             return;

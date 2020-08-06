@@ -16,10 +16,11 @@ Finally, you need to configure the plugin via XML. The file must be named `jira-
 <jira-configuration>
 
     <url>http://dummy-url.com</url>
-    <credentials>
-        <username>login-name-for-jira</username>
-        <password>jira-password</password>
-    </credentials>
+
+    <api-token>
+        <email>foo@bar.com</email>
+        <token>atlassian-token</token>
+    </api-token>
 
     <projects>
         <project>
@@ -33,10 +34,7 @@ Finally, you need to configure the plugin via XML. The file must be named `jira-
 </jira-configuration>
 ```
 
-IMPORTANT:
-Please note that the username for Jira must be the one you can find in the profile section in Jira. The Jira UI allows
-you to use your email as login name as well. This is not possible when querying the Jira REST API!
-
+To create an **Atlassian** token go to [this page](https://id.atlassian.com/manage-profile/security/api-tokens).
 Now scan your configuration and wait for the plugin to finish:
 
 ```bash

@@ -28,6 +28,11 @@ public class XMLParser {
     private static final String USERNAME_ELEMENT_NAME = "username";
     private static final String PASSWORD_ELEMENT_NAME = "password";
 
+    private static final String API_TOKEN_ELEMENT_NAME = "api-token";
+
+    private static final String EMAIL_ELEMENT_NAME = "email";
+    private static final String TOKEN_ELEMENT_NAME = "token";
+
     private static final String PROJECT_KEY_ELEMENT_NAME = "key";
 
     /**
@@ -45,9 +50,24 @@ public class XMLParser {
 
         String jiraUrl = this.parseJiraUrl(document);
         Optional<XMLCredentials> xmlCredentials = this.parseCredentials(document);
+        Optional<XMLApiToken> xmlApiToken = this.parseApiToken(document);
         List<XMLJiraProject> xmlJiraProjectList = this.parseJiraProjects(document);
 
-        return new XMLJiraPluginConfiguration(jiraUrl, xmlCredentials, xmlJiraProjectList);
+        return new XMLJiraPluginConfiguration(jiraUrl, xmlCredentials, xmlApiToken, xmlJiraProjectList);
+    }
+
+    private Optional<XMLApiToken> parseApiToken(Document document) {
+
+        Element apiTokenElement = document.getRootElement().getChild(API_TOKEN_ELEMENT_NAME);
+
+        if (apiTokenElement == null) {
+            return Optional.empty();
+        }
+
+        String email = apiTokenElement.getChildText(EMAIL_ELEMENT_NAME);
+        String token = apiTokenElement.getChildText(TOKEN_ELEMENT_NAME);
+
+        return Optional.of(new XMLApiToken(email, token));
     }
 
 

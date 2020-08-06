@@ -10,7 +10,7 @@ dependency-reduced-pom.xml
 run.sh
 run/
 test-project/
-jqassistant/store/
+jqassistant/
 jira-docker-data/
 
 # Local debugging

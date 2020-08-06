@@ -20,50 +20,22 @@ echo 'Removing ./jqassistant ...'
 rm -r jqassistant
 
 echo 'Copying plugin jar into jQAssistant CLI ...'
-cp target/jqa-jira-plugin-*.jar run/jqassistant-commandline-neo4jv3-1.6.0/plugins/
+cp target/jqa-jira-plugin-*.jar run/jqassistant-commandline-neo4jv3-1.8.0/plugins/
 
 # Scan the test project
-run/jqassistant-commandline-neo4jv3-1.6.0/bin/jqassistant.sh scan -f run/jira-plugin-configuration.xml
+run/jqassistant-commandline-neo4jv3-1.8.0/bin/jqassistant.sh scan -f run/jira-plugin-configuration.xml
 
 # Start a Neo4J server
-run/jqassistant-commandline-neo4jv3-1.6.0/bin/jqassistant.sh server
+run/jqassistant-commandline-neo4jv3-1.8.0/bin/jqassistant.sh server
 ```
 
 To use it create a `run` folder, put the command line distribution in it and paste a test configuration in 
 `run/jira-plugin-configuration.xml`. For a valid plugin configuration have a look at the [README.md](README.md).
 
-## Local Jira Server
+## DEV Jira Instance
 
-As of today, 2nd of June 2019, there is no official docker image available via 
-[Atlassian](https://hub.docker.com/u/atlassian). 
-[Dave Chevell](https://community.atlassian.com/t5/user/viewprofilepage/user-id/792201) a member of the *Atlassian* team
-maintains unofficial images which can be found here: https://hub.docker.com/r/dchevell/jira-software.
-For the plugin the current version 
-([8.2](https://confluence.atlassian.com/jirakb/jira-build-and-version-numbers-reference-347341143.html)) 
-of **Jira** is used.
-
-To create a new docker container on your machine first create a folder to persist your data:
-
-```shell
-mkdir jira-docker-data
-```
-
-Then run:
-
-```shell
-docker run \
-    -v `pwd`/jira-docker-data:/var/atlassian/application-data/jira \
-    --name="jira" \
-    -p 8080:8080 \
-    -d \
-    dchevell/jira-software:8.2-ubuntu
-```
-
-Now **Jira** is available on [http://localhost:8080](http://localhost:8080). If your persistence folder was empty before
-you need to complete the setup process once.
-
-For more information on how to configure the docker setup please see the 
-[dockerhub repository page](https://hub.docker.com/r/dchevell/jira-software).
+We created a free Jira DEV instance on [jqa-jira-plugin.atlassian.net](www.jqa-jira-plugin.atlassian.net) for developing.
+If you want to contribute to this project feel free to open an issue and we will add your **Atlassian** user account to our test project.
 
 ## Rate Limits
 

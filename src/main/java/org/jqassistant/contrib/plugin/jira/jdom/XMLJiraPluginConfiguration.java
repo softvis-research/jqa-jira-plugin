@@ -12,5 +12,6 @@ public class XMLJiraPluginConfiguration {
 
     private String url;
     private Optional<XMLCredentials> credentials;
+    private Optional<XMLApiToken> apiToken;
     private List<XMLJiraProject> projects;
 }
